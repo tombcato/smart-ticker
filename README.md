@@ -1,5 +1,6 @@
 <p align="center">
-  <img src="./public/logo.svg" alt="Smart Ticker" width="120" />
+  <img src="./public/logo.svg#gh-light-mode-only" alt="Smart Ticker" width="120" />
+  <img src="./public/logo-dark.svg#gh-dark-mode-only" alt="Smart Ticker" width="120" />
 </p>
 
 <h1 align="center">Smart Ticker</h1>
