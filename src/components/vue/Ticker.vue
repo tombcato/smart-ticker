@@ -4,7 +4,7 @@
       v-for="(col, i) in renderedColumns"
       :key="i"
       class="ticker-column"
-      :style="{ width: `${col.width}em` }"
+      :style="{ width: `${col.width * 0.8 * charWidth}em` }"
     >
       <div
         v-for="charObj in col.chars"
@@ -45,6 +45,7 @@ const props = defineProps({
   direction: { type: String as () => ScrollingDirection, default: 'ANY' },
   easing: { type: String, default: 'easeInOut' },
   className: { type: String, default: '' },
+  charWidth: { type: Number, default: 1 },
 });
 
 const columns = ref<ColumnState[]>([]);
@@ -172,7 +173,7 @@ const renderedColumns = computed(() => {
 .ticker {
     display: inline-flex;
     overflow: hidden;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
     font-weight: 600;
     line-height: 1.2;
 }

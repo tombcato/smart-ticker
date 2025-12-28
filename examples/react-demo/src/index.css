@@ -1,0 +1,160 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: #ffffff;
+    color: #1a1d2d;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.app-container {
+    width: 100%;
+    max-width: 800px;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4rem;
+}
+
+/* Ticker Display */
+.ticker-display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 8rem;
+    font-weight: 700;
+    color: #1a1d2d;
+}
+
+.currency-symbol {
+    font-size: 0.5em;
+    color: #8f92a1;
+    margin-right: 0.2rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+/* Force JetBrains Mono override */
+.ticker {
+    font-family: 'JetBrains Mono', monospace !important;
+}
+
+/* Controls */
+.controls {
+    display: flex;
+    justify-content: center;
+    gap: 4rem;
+    width: 100%;
+}
+
+.control-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.label {
+    font-size: 0.9rem;
+    color: #a0a3bd;
+    font-weight: 500;
+}
+
+.options {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+button {
+    background: transparent;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    color: #8f92a1;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+button:hover {
+    color: #5d6076;
+}
+
+button.active {
+    background-color: #eef0ff;
+    color: #4a6bff;
+    font-weight: 600;
+}
+
+button:active {
+    transform: scale(0.98);
+}
+/* Header Styles */
+header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+header h1 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(90deg, #1a1d2d, #4a6bff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.subtitle {
+  color: #8f92a1;
+}
+/* Footer/Code Styles */
+.code-section {
+  width: 100%;
+  margin-top: 2rem;
+  background: #f8f9fc;
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid #eef0ff;
+}
+.code-section h2 {
+  font-size: 1rem;
+  color: #a0a3bd;
+  margin-bottom: 1rem;
+}
+pre {
+  background: #1a1d2d;
+  padding: 1rem;
+  border-radius: 8px;
+  overflow-x: auto;
+}
+code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.9rem;
+  color: #a5b3ff;
+}
+
+button {
+    white-space: nowrap;
+}
+
+.header-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+.logo {
+  width: 48px;
+  height: 48px;
+}
+header h1 {
+  margin-bottom: 0 !important;
+}

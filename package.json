@@ -1,6 +1,6 @@
 {
   "name": "@tombcato/smart-ticker",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "description": "Smart text animation component with diff-based character scrollin",
   "type": "module",
   "main": "./dist/index.cjs",
