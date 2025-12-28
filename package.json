@@ -1,7 +1,7 @@
 {
   "name": "@tombcato/smart-ticker",
   "version": "1.0.0",
-  "description": "Smart text animation component with diff-based character scrolling. Inspired by Robinhood Ticker.",
+  "description": "Smart text animation component with diff-based character scrollin",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",

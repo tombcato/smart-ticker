@@ -6,7 +6,7 @@
 <h1 align="center">Smart Ticker</h1>
 
 <p align="center">
-  高性能智能文本差异滚动组件，基于 Levenshtein diff 算法，支持React/Vue
+  高性能智能文本差异滚动组件，基于 Levenshtein diff 算法，支持多字符集，适用于React/Vue，<a href="https://tombcato.github.io/smart-ticker/">官网演示></a>
 </p>
 
 <p align="center">
@@ -20,10 +20,6 @@
   <img src="https://img.shields.io/npm/v/@tombcato/smart-ticker?color=cb3837&logo=npm" alt="npm" />
 </p>
 
-<p align="center">
-  <a href="https://tombcato.github.io/smart-ticker/">📺 官网演示</a> ·
-  <a href="https://www.npmjs.com/package/@tombcato/smart-ticker">📥 NPM</a>
-</p>
 
 ## ✨ 特性
 
@@ -31,6 +27,7 @@
 - **平滑中断** - 动画过程中值变化时，从当前位置无缝衔接到新目标
 - **多种缓动曲线** - 支持 `linear`、`easeInOut`、`bounce` 等多种动画效果
 - **字符宽度可调** - 通过 `charWidth` 属性控制字符间距
+- **多字符集支持** - 支持数字、字母、符号等多种字符集，可混合使用
 - **双框架支持** - 提供 React 组件和 Vue 组件
 - **高性能** - 使用 `requestAnimationFrame` 和 `React.memo` 优化渲染
 
