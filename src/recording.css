@@ -1,0 +1,43 @@
+/* Recording Mode Styles */
+.recording-mode .header-bar,
+.recording-mode .footer,
+.recording-mode .price-controls,
+.recording-mode .section-title,
+.recording-mode .feature-grid,
+.recording-mode .scene-grid,
+.recording-mode .hero-subtitle,
+.recording-mode button {
+    display: none !important;
+}
+
+.recording-mode .app-container {
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+    background: var(--bg-body);
+}
+
+.recording-mode .main-content {
+    flex: 0 0 auto;
+    width: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+}
+
+.recording-mode .price-hero {
+    margin: 0;
+    padding: 2rem;
+    background: transparent;
+    transform: scale(1.5);
+    /* Scale up for visibility */
+}
+
+.recording-mode .price-value {
+    font-size: 8rem;
+    /* Make it huge */
+    margin: 0;
+    text-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}

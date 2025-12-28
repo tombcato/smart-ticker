@@ -1,0 +1,7 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="6" y="8" width="5" height="16" rx="2.5" fill="#888888" fill-opacity="0.3" />
+    <rect x="13.5" y="4" width="5" height="16" rx="2.5" fill="#6366f1">
+        <animate attributeName="y" values="4; 12; 4" dur="4s" repeatCount="indefinite" calcMode="spline" keySplines="0.4 0 0.2 1; 0.4 0 0.2 1" />
+    </rect>
+    <rect x="21" y="10" width="5" height="16" rx="2.5" fill="#888888" fill-opacity="0.6" />
+</svg>

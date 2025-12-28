@@ -1,0 +1,28 @@
+.ticker {
+  display: inline-flex;
+  overflow: hidden;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.ticker-column {
+  display: inline-block;
+  height: 1.2em;
+  overflow: hidden;
+  position: relative;
+  /* 确保字符边缘不会露出 */
+  clip-path: inset(0);
+}
+
+.ticker-char {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1.2em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: pre;
+}

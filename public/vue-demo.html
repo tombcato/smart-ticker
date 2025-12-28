@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue Ticker Demo</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f172a;
+            --bg-card: #1e293b;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #6366f1;
+            --accent-glow: rgba(99, 102, 241, 0.4);
+            --border: #334155;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        /* Price Hero Styles */
+        .price-hero {
+            width: 100%;
+            max-width: 1000px;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .price-label {
+            font-size: 1rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .price-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 5rem;
+            font-weight: 700;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 3rem;
+        }
+
+        .price-currency {
+            font-size: 3rem;
+            margin-right: 0.25rem;
+            color: var(--text-muted);
+        }
+
+        @media (max-width: 768px) {
+            .price-value {
+                font-size: 3rem;
+            }
+
+            .price-currency {
+                font-size: 2rem;
+            }
+        }
+
+        /* Controls */
+        .price-controls {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(30, 41, 59, 0.5);
+            padding: 1rem;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .control-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .control-buttons {
+            display: flex;
+            gap: 0.4rem;
+        }
+
+        .control-buttons button {
+            padding: 0.4rem 0.8rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s;
+        }
+
+        .control-buttons button:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .control-buttons button.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        /* Ticker Component Styles */
+        .ticker {
+            display: inline-flex;
+            overflow: hidden;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+
+        .ticker-column {
+            display: inline-block;
+            height: 1.2em;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .ticker-char {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1.2em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            white-space: pre;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div class="price-hero">
+            <div class="price-label">价格</div>
+            <div class="price-value">
+                <span class="price-currency">$</span>
+                <ticker-component :value="heroPrice" :duration="animDuration" :easing="easing" :char-width="charWidth"
+                    :character-lists="['0123456789.,']"></ticker-component>
+            </div>
+
+            <div class="price-controls">
+                <div class="control-group">
+                    <span class="control-label">字符宽度</span>
+                    <div class="control-buttons">
+                        <button v-for="w in widthOptions" :key="w" :class="{ active: charWidth === w }"
+                            @click="charWidth = w">
+                            {{ w }}x
+                        </button>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <span class="control-label">动画时长</span>
+                    <div class="control-buttons">
+                        <button v-for="d in durationOptions" :key="d" :class="{ active: animDuration === d }"
+                            @click="animDuration = d">
+                            {{ d }}ms
+                        </button>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <span class="control-label">缓动曲线</span>
+                    <div class="control-buttons">
+                        <button v-for="e in easingOptions" :key="e.name" :class="{ active: easing === e.name }"
+                            @click="easing = e.name">
+                            {{ e.label }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp, ref, computed, watch, onUnmounted, onMounted } = Vue;
+
+        // ============================================================================
+        // Constants & Logic
+        // ============================================================================
+        const EMPTY_CHAR = '\0';
+
+        const easingFunctions = {
+            linear: (t) => t,
+            easeIn: (t) => t * t,
+            easeOut: (t) => 1 - (1 - t) * (1 - t),
+            easeInOut: (t) => t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2,
+            bounce: (t) => {
+                const n1 = 7.5625, d1 = 2.75;
+                if (t < 1 / d1) return n1 * t * t;
+                else if (t < 2 / d1) return n1 * (t -= 1.5 / d1) * t + 0.75;
+                else if (t < 2.5 / d1) return n1 * (t -= 2.25 / d1) * t + 0.9375;
+                else return n1 * (t -= 2.625 / d1) * t + 0.984375;
+            },
+        };
+
+        class TickerCharacterList {
+            constructor(characterList) {
+                const charsArray = characterList.split('');
+                const length = charsArray.length;
+                this.numOriginalCharacters = length;
+                this.characterIndicesMap = new Map();
+                for (let i = 0; i < length; i++) this.characterIndicesMap.set(charsArray[i], i);
+                this.characterList = new Array(length * 2 + 1);
+                this.characterList[0] = EMPTY_CHAR;
+                for (let i = 0; i < length; i++) {
+                    this.characterList[1 + i] = charsArray[i];
+                    this.characterList[1 + length + i] = charsArray[i];
+                }
+            }
+            getCharacterIndices(start, end, direction) {
+                let startIndex = this.getIndexOfChar(start);
+                let endIndex = this.getIndexOfChar(end);
+                if (startIndex < 0 || endIndex < 0) return null;
+                if (direction === 'DOWN') {
+                    if (end === EMPTY_CHAR) endIndex = this.characterList.length;
+                    else if (endIndex < startIndex) endIndex += this.numOriginalCharacters;
+                } else if (direction === 'UP') {
+                    if (startIndex < endIndex) startIndex += this.numOriginalCharacters;
+                } else if (direction === 'ANY') {
+                    if (start !== EMPTY_CHAR && end !== EMPTY_CHAR) {
+                        if (endIndex < startIndex) {
+                            const nonWrap = startIndex - endIndex;
+                            const wrap = this.numOriginalCharacters - startIndex + endIndex;
+                            if (wrap < nonWrap) endIndex += this.numOriginalCharacters;
+                        } else if (startIndex < endIndex) {
+                            const nonWrap = endIndex - startIndex;
+                            const wrap = this.numOriginalCharacters - endIndex + startIndex;
+                            if (wrap < nonWrap) startIndex += this.numOriginalCharacters;
+                        }
+                    }
+                }
+                return { startIndex, endIndex };
+            }
+            getSupportedCharacters() { return new Set(this.characterIndicesMap.keys()); }
+            getCharacterList() { return this.characterList; }
+            getIndexOfChar(c) {
+                if (c === EMPTY_CHAR) return 0;
+                if (this.characterIndicesMap.has(c)) return this.characterIndicesMap.get(c) + 1;
+                return -1;
+            }
+        }
+
+        const ACTION_SAME = 0, ACTION_INSERT = 1, ACTION_DELETE = 2;
+        function computeColumnActions(source, target, supported) {
+            let si = 0, ti = 0;
+            const actions = [];
+            while (true) {
+                const endS = si === source.length;
+                const endT = ti === target.length;
+                if (endS && endT) break;
+                if (endS) { for (; ti < target.length; ti++) actions.push(ACTION_INSERT); break; }
+                if (endT) { for (; si < source.length; si++) actions.push(ACTION_DELETE); break; }
+                const sSupp = supported.has(source[si]);
+                const tSupp = supported.has(target[ti]);
+                if (sSupp && tSupp) {
+                    let se = si + 1, te = ti + 1;
+                    while (se < source.length && supported.has(source[se])) se++;
+                    while (te < target.length && supported.has(target[te])) te++;
+                    const sLen = se - si, tLen = te - ti;
+                    if (sLen === tLen) for (let i = 0; i < sLen; i++) actions.push(ACTION_SAME);
+                    else {
+                        const matrix = Array(sLen + 1).fill(null).map(() => Array(tLen + 1).fill(0));
+                        for (let i = 0; i <= sLen; i++) matrix[i][0] = i;
+                        for (let j = 0; j <= tLen; j++) matrix[0][j] = j;
+                        for (let r = 1; r <= sLen; r++) {
+                            for (let c = 1; c <= tLen; c++) {
+                                const cost = source[si + r - 1] === target[ti + c - 1] ? 0 : 1;
+                                matrix[r][c] = Math.min(matrix[r - 1][c] + 1, matrix[r][c - 1] + 1, matrix[r - 1][c - 1] + cost);
+                            }
+                        }
+                        const result = [];
+                        let r = sLen, c = tLen;
+                        while (r > 0 || c > 0) {
+                            if (r === 0) { result.push(ACTION_INSERT); c--; }
+                            else if (c === 0) { result.push(ACTION_DELETE); r--; }
+                            else {
+                                const ins = matrix[r][c - 1], del = matrix[r - 1][c], rep = matrix[r - 1][c - 1];
+                                if (ins < del && ins < rep) { result.push(ACTION_INSERT); c--; }
+                                else if (del < rep) { result.push(ACTION_DELETE); r--; }
+                                else { result.push(ACTION_SAME); r--; c--; }
+                            }
+                        }
+                        for (let i = result.length - 1; i >= 0; i--) actions.push(result[i]);
+                    }
+                    si = se; ti = te;
+                } else if (sSupp) { actions.push(ACTION_INSERT); ti++; }
+                else if (tSupp) { actions.push(ACTION_DELETE); si++; }
+                else { actions.push(ACTION_SAME); si++; ti++; }
+            }
+            return actions;
+        }
+
+        function createColumn() {
+            return {
+                currentChar: EMPTY_CHAR, targetChar: EMPTY_CHAR, charList: null,
+                startIndex: 0, endIndex: 0, sourceWidth: 0, currentWidth: 0, targetWidth: 0,
+                directionAdj: 1, prevDelta: 0, currDelta: 0,
+            };
+        }
+
+        function setTarget(col, target, lists, dir) {
+            const c = { ...col };
+            c.targetChar = target;
+            c.sourceWidth = c.currentWidth;
+            c.targetWidth = target === EMPTY_CHAR ? 0 : 1;
+            let found = false;
+            for (const list of lists) {
+                const indices = list.getCharacterIndices(c.currentChar, target, dir);
+                if (indices) {
+                    c.charList = list.getCharacterList();
+                    c.startIndex = indices.startIndex;
+                    c.endIndex = indices.endIndex;
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                c.charList = c.currentChar === target ? [c.currentChar] : [c.currentChar, target];
+                c.startIndex = 0;
+                c.endIndex = c.currentChar === target ? 0 : 1;
+            }
+            c.directionAdj = c.endIndex >= c.startIndex ? 1 : -1;
+            c.prevDelta = c.currDelta;
+            c.currDelta = 0;
+            return c;
+        }
+
+        function applyProgress(col, progress, forceUpdate = false) {
+            const c = { ...col };
+            const total = Math.abs(c.endIndex - c.startIndex);
+            const pos = progress * total;
+            const offset = pos - Math.floor(pos);
+            const additional = c.prevDelta * (1 - progress);
+            const delta = offset * c.directionAdj + additional;
+            const charIdx = c.startIndex + Math.floor(pos) * c.directionAdj;
+            if (progress >= 1) {
+                c.currentChar = c.targetChar;
+                c.currDelta = 0;
+                c.prevDelta = 0;
+            } else if (forceUpdate && c.charList && charIdx >= 0 && charIdx < c.charList.length) {
+                c.currentChar = c.charList[charIdx];
+                c.currDelta = delta;
+            }
+            c.currentWidth = c.sourceWidth + (c.targetWidth - c.sourceWidth) * progress;
+            return { col: c, charIdx, delta };
+        }
+
+        const TickerComponent = {
+            template: `
+                <div class="ticker" :class="className">
+                    <div v-for="(col, i) in renderedColumns" :key="i" class="ticker-column" :style="{ width: col.width + 'em' }">
+                        <div v-for="charObj in col.chars" :key="charObj.key" class="ticker-char" :style="{ transform: 'translateY(' + charObj.offset + 'em)' }">
+                            {{ charObj.char === '${EMPTY_CHAR}' ? '\u00A0' : charObj.char }}
+                        </div>
+                    </div>
+                </div>
+            `,
+            props: {
+                value: { type: String, required: true },
+                characterLists: { type: Array, default: () => ['0123456789'] },
+                duration: { type: Number, default: 500 },
+                direction: { type: String, default: 'ANY' },
+                easing: { type: String, default: 'easeInOut' },
+                className: { type: String, default: '' },
+                charWidth: { type: Number, default: 1 },
+            },
+            setup(props) {
+                const columns = ref([]);
+                const progress = ref(1);
+                let animId;
+
+                const lists = computed(() => props.characterLists.map(s => new TickerCharacterList(s)));
+                const supported = computed(() => {
+                    const set = new Set();
+                    lists.value.forEach(l => l.getSupportedCharacters().forEach(c => set.add(c)));
+                    return set;
+                });
+
+                watch(() => props.value, (newValue, oldValue) => {
+                    if (newValue === oldValue) return;
+                    if (animId) { cancelAnimationFrame(animId); animId = undefined; }
+
+                    let currentCols = columns.value;
+                    if (progress.value < 1 && progress.value > 0) {
+                        currentCols = currentCols.map(c => applyProgress(c, progress.value, true).col);
+                    }
+
+                    const targetChars = newValue.split('');
+                    const sourceChars = currentCols.map(c => c.currentChar);
+                    const actions = computeColumnActions(sourceChars, targetChars, supported.value);
+                    let ci = 0, ti = 0;
+                    const result = [];
+                    const validCols = currentCols.filter(c => c.currentWidth > 0);
+
+                    for (const action of actions) {
+                        if (action === ACTION_INSERT) result.push(setTarget(createColumn(), targetChars[ti++], lists.value, props.direction));
+                        else if (action === ACTION_SAME) {
+                            const existing = validCols[ci++] || createColumn();
+                            result.push(setTarget(existing, targetChars[ti++], lists.value, props.direction));
+                        } else {
+                            const existing = validCols[ci++] || createColumn();
+                            result.push(setTarget(existing, EMPTY_CHAR, lists.value, props.direction));
+                        }
+                    }
+
+                    columns.value = result;
+                    progress.value = 0;
+                    const start = performance.now();
+                    const dur = props.duration;
+                    const easeFn = easingFunctions[props.easing] || easingFunctions.linear;
+                    let lastUpdate = 0;
+
+                    const animate = (now) => {
+                        const linearP = Math.min((now - start) / dur, 1);
+                        const p = easeFn(linearP);
+                        if (now - lastUpdate >= 16 || linearP >= 1) {
+                            lastUpdate = now;
+                            progress.value = p;
+                        }
+                        if (linearP < 1) animId = requestAnimationFrame(animate);
+                        else {
+                            const final = columns.value.map(c => applyProgress(c, 1).col).filter(c => c.currentWidth > 0);
+                            columns.value = final;
+                            progress.value = 1;
+                            animId = undefined;
+                        }
+                    };
+                    animId = requestAnimationFrame(animate);
+                }, { immediate: true });
+
+                onUnmounted(() => { if (animId) cancelAnimationFrame(animId); });
+
+                const charHeight = 1.2;
+                const renderedColumns = computed(() => {
+                    return columns.value.map(col => {
+                        const { charIdx, delta } = applyProgress(col, progress.value);
+                        const logicalWidth = col.sourceWidth + (col.targetWidth - col.sourceWidth) * progress.value;
+                        const width = logicalWidth * props.charWidth * 0.8;
+                        if (width <= 0) return { width, chars: [] };
+                        const chars = [];
+                        const list = col.charList || [];
+                        const deltaEm = delta * charHeight;
+                        const add = (idx, offsetMod, keyPrefix) => {
+                            if (idx >= 0 && idx < list.length) {
+                                chars.push({ key: keyPrefix + '-' + idx, char: list[idx], offset: deltaEm + offsetMod });
+                            }
+                        };
+                        add(charIdx, 0, 'c');
+                        add(charIdx + 1, -charHeight, 'n');
+                        add(charIdx - 1, charHeight, 'p');
+                        return { width, chars };
+                    }).filter(c => c.width > 0);
+                });
+
+                return { renderedColumns, EMPTY_CHAR };
+            }
+        };
+
+        createApp({
+            components: { TickerComponent },
+            setup() {
+                const priceSequence = ['73.18', '76.58', '173.50', '9.1'];
+                const heroPrice = ref(priceSequence[0]);
+                const animDuration = ref(800);
+                const easing = ref('easeInOut');
+                const charWidth = ref(1);
+                const durationOptions = [400, 800, 1200];
+                const widthOptions = [0.8, 1, 1.2];
+                const easingOptions = [
+                    { name: 'linear', label: '线性' },
+                    { name: 'easeInOut', label: '先加后减' },
+                    { name: 'bounce', label: '回弹' },
+                ];
+
+                let interval;
+
+                watch(animDuration, (newDur) => {
+                    if (interval) clearInterval(interval);
+                    startInterval();
+                });
+
+                const startInterval = () => {
+                    let priceIdx = 0;
+                    interval = setInterval(() => {
+                        priceIdx = (priceIdx + 1) % priceSequence.length;
+                        heroPrice.value = priceSequence[priceIdx];
+                    }, animDuration.value + 1000);
+                };
+
+                onMounted(() => {
+                    startInterval();
+                });
+
+                onUnmounted(() => {
+                    if (interval) clearInterval(interval);
+                });
+
+                return {
+                    heroPrice,
+                    animDuration,
+                    easing,
+                    charWidth,
+                    durationOptions,
+                    widthOptions,
+                    easingOptions
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+
+</html>
