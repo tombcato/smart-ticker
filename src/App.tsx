@@ -79,7 +79,7 @@ function App() {
     const t = {
         zh: {
             title: 'SmartTicker',
-            subtitle: '基于 Levenshtein diff 算法的高性能文本滚动组件，支持React/Vue',
+            subtitle: '高性能智能文本差异滚动组件，支持React/Vue',
             price: '价格',
             duration: '动画时长',
             width: '字符宽度',
@@ -128,7 +128,7 @@ function App() {
         },
         en: {
             title: 'SmartTicker',
-            subtitle: 'High-performance text scrolling based on Levenshtein Diff, supports React/Vue',
+            subtitle: 'High-performance smart text diff scroller for React/Vue',
             price: 'Price',
             duration: 'Duration',
             width: 'Char Width',
@@ -261,7 +261,7 @@ function App() {
                         </svg>
                     </a>
 
-                    <a href="https://github.com/yourusername/smart-ticker" className="icon-btn" target="_blank" title="View on GitHub">
+                    <a href="https://github.com/tombcato/smart-ticker" className="icon-btn" target="_blank" title="View on GitHub">
                         <svg height="20" viewBox="0 0 16 16" version="1.1" width="20" aria-hidden="true" fill="currentColor">
                             <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"></path>
                         </svg>
@@ -273,7 +273,7 @@ function App() {
 
             {/* 实时价格展示 - 核心 Hero */}
             <div className="price-hero">
-                <a href="#" className="hero-subtitle subtitle-link">
+                <a href="https://github.com/tombcato/smart-ticker" className="hero-subtitle subtitle-link" target="_blank">
                     <span>{t.subtitle}</span>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="arrow-icon">
                         <line x1="7" y1="17" x2="17" y2="7"></line>

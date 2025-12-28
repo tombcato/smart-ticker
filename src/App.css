@@ -169,23 +169,31 @@ body {
 }
 
 .hero-subtitle {
-    font-size: 0.9rem;
-    color: var(--accent);
+    font-size: 0.85rem;
+    color: var(--text-muted);
     margin-bottom: 1.5rem;
-    font-weight: 600;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    display: flex;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
+    gap: 0.4rem;
+    text-decoration: none;
+    transition: color 0.2s;
 }
 
-.hero-subtitle span {
-    background: var(--accent-glow);
-    padding: 0.3rem 0.8rem;
-    border-radius: 20px;
-    border: 1px solid rgba(99, 102, 241, 0.2);
+.hero-subtitle:hover {
+    color: var(--accent);
+}
+
+.hero-subtitle .arrow-icon {
+    opacity: 0.5;
+    transition: opacity 0.2s, transform 0.2s;
+}
+
+.hero-subtitle:hover .arrow-icon {
+    opacity: 1;
+    transform: translate(2px, -2px);
 }
 
 .github-badge {

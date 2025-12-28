@@ -20,6 +20,11 @@
   <img src="https://img.shields.io/npm/v/@tombcato/smart-ticker?color=cb3837&logo=npm" alt="npm" />
 </p>
 
+<p align="center">
+  <a href="https://tombcato.github.io/smart-ticker/">📺 官网演示</a> ·
+  <a href="https://www.npmjs.com/package/@tombcato/smart-ticker">📥 NPM</a>
+</p>
+
 ## ✨ 特性
 
 - **智能差异动画** - 只有变化的字符会滚动，相同的字符保持静止
