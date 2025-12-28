@@ -1,11 +1,23 @@
-# Ticker - 智能文本滚动动画组件
+<p align="center">
+  <img src="./public/logo.svg" alt="Smart Ticker" width="120" />
+</p>
 
-> 灵感来自 [Robinhood Ticker](https://github.com/robinhood/ticker)，使用 TypeScript 重新实现，支持 React 和 Vue。
+<h1 align="center">Smart Ticker</h1>
 
-![Demo](https://img.shields.io/badge/Demo-Live-brightgreen)
-![React](https://img.shields.io/badge/React-18+-61DAFB?logo=react)
-![Vue](https://img.shields.io/badge/Vue-3+-4FC08D?logo=vuedotjs)
-![TypeScript](https://img.shields.io/badge/TypeScript-5+-3178C6?logo=typescript)
+<p align="center">
+  高性能智能文本差异滚动组件，基于 Levenshtein diff 算法，支持React/Vue
+</p>
+
+<p align="center">
+  <img src="./smartticker.gif" alt="Demo" width="600" />
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/React-18+-61DAFB?logo=react" alt="React" />
+  <img src="https://img.shields.io/badge/Vue-3+-4FC08D?logo=vuedotjs" alt="Vue" />
+  <img src="https://img.shields.io/badge/TypeScript-5+-3178C6?logo=typescript" alt="TypeScript" />
+  <img src="https://img.shields.io/npm/v/@tombcato/smart-ticker?color=cb3837&logo=npm" alt="npm" />
+</p>
 
 ## ✨ 特性
 
@@ -18,12 +30,20 @@
 
 ## 📦 安装
 
+### NPM 安装（推荐）
+
+```bash
+npm install @tombcato/smart-ticker
+```
+
+### 从源码安装
+
 ```bash
 # 克隆仓库
-git clone https://github.com/your-username/ticker-smart-text-diff.git
+git clone https://github.com/tombcato/smart-ticker.git
 
 # 安装依赖
-cd ticker-smart-text-diff
+cd smart-ticker
 npm install
 
 # 启动开发服务器
@@ -135,6 +155,3 @@ ticker-smart-text-diff/
 
 MIT
 
-## 🙏 致谢
-
-- [Robinhood Ticker](https://github.com/robinhood/ticker) - 原始 Android 实现

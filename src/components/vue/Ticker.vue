@@ -32,7 +32,6 @@ import {
     easingFunctions,
     ACTION_INSERT,
     ACTION_SAME,
-    ACTION_DELETE,
 } from '../../core/TickerCore';
 
 // ============================================================================

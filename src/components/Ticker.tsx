@@ -17,7 +17,6 @@ import {
     easingFunctions,
     ACTION_INSERT,
     ACTION_SAME,
-    ACTION_DELETE,
 } from '../core/TickerCore';
 
 // 导出 Utils 供外部使用
