@@ -925,3 +925,7 @@ body {
 .header-bar {
     width: 100%;
 }
+/* Force JetBrains Mono override for dev demo */
+.ticker {
+    font-family: 'JetBrains Mono', monospace !important;
+}
