@@ -219,7 +219,7 @@ function App() {
                 </div>
 
                 <div className="header-right nav-group">
-                    <a href="/vue-demo.html" className="nav-link" target="_blank">
+                    <a href={`${import.meta.env.BASE_URL}vue-demo.html`} className="nav-link" target="_blank">
                         {t.vueDemo}
                     </a>
 
