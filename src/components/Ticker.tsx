@@ -92,7 +92,7 @@ export const Ticker: React.FC<TickerProps> = ({
             colsRef.current = currentCols;
         }
 
-        const targetChars = value.split('');
+        const targetChars = [...value];
         const sourceChars = currentCols.map(c => c.currentChar);
         const actions = computeColumnActions(sourceChars, targetChars, supportedRef.current);
 
@@ -203,9 +203,21 @@ export const Ticker: React.FC<TickerProps> = ({
                 );
             }
 
-            // 基准宽度 0.8em * 倍率
+            // 动态计算字符基础宽度：全角字符 1.1em，半角 0.8em
+            // 使用线性插值 (Lerp) 避免突变跳动
+            const isFW = (c: string) => c && c.length > 0 && c.charCodeAt(0) > 255;
+            const getW = (c: string) => isFW(c) ? 1.25 : 0.8;
+
+            // 安全获字符
+            const startChar = list[col.startIndex];
+            const endChar = list[col.endIndex];
+
+            const w1 = getW(startChar);
+            const w2 = getW(endChar);
+            const baseW = w1 + (w2 - w1) * progress;
+
             return (
-                <div key={i} className="ticker-column" style={{ width: `${width * 0.8 * charWidth}em` }}>
+                <div key={i} className="ticker-column" style={{ width: `${width * baseW * charWidth}em` }}>
                     {chars}
                 </div>
             );

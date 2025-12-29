@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import Ticker from './components/Ticker';
+import Ticker, { TickerUtils } from './components/Ticker';
 import './App.css';
 import './recording.css';
 
@@ -19,21 +19,49 @@ const randomWithDigitChange = (current: number) => {
 
 function App() {
     // 状态定义
+    const [heroMode, setHeroMode] = useState<'price' | 'text'>('price');
     const [heroPrice, setHeroPrice] = useState(73.18);
+    const [heroText, setHeroText] = useState('Success');
+
     const [animDuration, setAnimDuration] = useState(800);
     const [easing, setEasing] = useState('easeInOut');
     const [charWidth, setCharWidth] = useState(1);
 
     const sequenceIdx = useRef(0);
     const priceSequence = [73.18, 76.58, 173.50, 9.1];
+    // 精心设计的 Diff 演示序列
+    const textSequence = [
+        'Smart Ticker🎉', // Base
+        '🐱Small Diff',   // 1. Prefix Match: 'Smart' stays
+        '🐱哈基米 Dif@#$',     // 4. Letters + Numbers
+        '🚀硅基生命 %@#$',   // 6. Complete Change
+        '🚀宇宙生命 Smart',    // 7. Symbols + Digits
+    ];
 
     const [digitDemo, setDigitDemo] = useState(999);
     const [interruptTarget, setInterruptTarget] = useState(50);
-    const [mixedDemo, setMixedDemo] = useState('A1-B2#C');
+    const [mixedDemo, setMixedDemo] = useState('A1-哈基米🐱');
 
-    const [volume, setVolume] = useState(8567890);
-    const [scoreA, setScoreA] = useState(1);
-    const [scoreB, setScoreB] = useState(1);
+    const [installStatus, setInstallStatus] = useState('Waiting...');
+    const [installIndex, setInstallIndex] = useState(0);
+    const installSequence = [
+        'Waiting...',
+        'Downloading... 12%',
+        'Downloading... 42%',
+        'Downloading... 89%',
+        'Verifying...',
+        'Completed',
+    ];
+    const [musicStatus, setMusicStatus] = useState('🎵 七里香 - 周杰伦');
+    const [musicIndex, setMusicIndex] = useState(0);
+    const musicSequence = [
+        '🎵 七里香 - 周杰伦',
+        '🎵 哈基香 - 爱杰伦',
+        '🎵 夜曲 - Jay Chou',
+        '💿 Mojo - Chou',
+        '🎸 富士山下 - Eason',
+        '🎸 浮夸 - Eason',
+    ];
 
     // Scenarios State
     const [btcPrice, setBtcPrice] = useState(98456.32);
@@ -53,9 +81,11 @@ function App() {
     // 自动更新模拟数据
     useEffect(() => {
         const interval = setInterval(() => {
-            // 按顺序更新 Hero 价格
-            sequenceIdx.current = (sequenceIdx.current + 1) % priceSequence.length;
-            setHeroPrice(priceSequence[sequenceIdx.current]);
+            // 按顺序更新 Hero 价格/文本
+            sequenceIdx.current = (sequenceIdx.current + 1); // Remove % length here, handle individually below
+
+            setHeroPrice(priceSequence[sequenceIdx.current % priceSequence.length]);
+            setHeroText(textSequence[sequenceIdx.current % textSequence.length]);
 
             // 更新 BTC 价格
             const btcChange = (Math.random() - 0.5) * 500;
@@ -63,11 +93,18 @@ function App() {
             setBtcTrend(btcChange >= 0 ? 'up' : 'down');
 
             // 统一更新场景模拟数据
-            setVolume(prev => Math.floor(prev * (1 + (Math.random() - 0.5) * 0.05)));
+            setInstallIndex(prev => {
+                const next = (prev + 1) % installSequence.length;
+                setInstallStatus(installSequence[next]);
+                return next;
+            });
 
-            // 随机加分
-            if (Math.random() > 0.5) setScoreA(s => s >= 99 ? 0 : s + 1);
-            else setScoreB(s => s >= 99 ? 0 : s + 1);
+            // 切换音乐
+            setMusicIndex(prev => {
+                const next = (prev + 1) % musicSequence.length;
+                setMusicStatus(musicSequence[next]);
+                return next;
+            });
 
             // 自动切换隐私模式
             setIsBalanceHidden(prev => !prev);
@@ -81,6 +118,7 @@ function App() {
             title: 'SmartTicker',
             subtitle: '高性能智能文本差异滚动组件，支持React/Vue',
             price: '价格',
+            text: '文本',
             duration: '动画时长',
             width: '字符宽度',
             easing: '缓动曲线',
@@ -110,8 +148,8 @@ function App() {
                 title: '现实场景模拟',
                 airport: '机场信息',
                 elevator: '电梯楼层',
-                volume: '成交量',
-                score: '体育比分',
+                install: '系统更新',
+                music: '正在播放',
                 privacy: '隐私模式'
             },
             highlights: [
@@ -130,6 +168,7 @@ function App() {
             title: 'SmartTicker',
             subtitle: 'High-performance smart text diff scroller for React/Vue',
             price: 'Price',
+            text: 'Text',
             duration: 'Duration',
             width: 'Char Width',
             easing: 'Easing',
@@ -159,8 +198,8 @@ function App() {
                 title: 'Real-world Scenarios',
                 airport: 'Airport Algo',
                 elevator: 'Elevator',
-                volume: 'Volume',
-                score: 'Scoreboard',
+                install: 'System Update',
+                music: 'Now Playing',
                 privacy: 'Privacy'
             },
             highlights: [
@@ -192,13 +231,36 @@ function App() {
 
     const randomMixed = () => {
         const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-#$';
+        const emojis = ['🍕', '🚀', '🌙', '🎉', '🐱', '🌵', '🔥', '💎', '🦄', '🤖', '🦖', '🍎'];
+        const chinese = '天地玄黄宇宙洪荒日月盈昃辰宿列张寒来暑往秋收冬藏龙师火帝鸟官人皇';
         let res = '';
-        for (let i = 0; i < 7; i++) res += chars[Math.floor(Math.random() * chars.length)];
+        for (let i = 0; i < 7; i++) {
+            const r = Math.random();
+            if (r > 0.85) {
+                res += emojis[Math.floor(Math.random() * emojis.length)];
+            } else if (r > 0.70) {
+                res += chinese[Math.floor(Math.random() * chinese.length)];
+            } else {
+                res += chars[Math.floor(Math.random() * chars.length)];
+            }
+        }
         setMixedDemo(res);
     };
 
     // 录制模式检测
     const isRecording = new URLSearchParams(window.location.search).get('rec') === '1';
+
+    // Hero Value Logic
+    const heroValue = heroMode === 'price' ? heroPrice.toFixed(2) : heroText;
+    // Expanded character support for Text Mode
+    const heroChars = heroMode === 'price'
+        ? PRICE_CHARS
+        : [
+            TickerUtils.provideAlphabeticalList(),
+            TickerUtils.provideAlphabeticalList().toUpperCase(),
+            TickerUtils.provideNumberList(),
+            ' .%v-' // Support space, dot, percent, 'v', hyphen
+        ];
 
     return (
         <div className={`app-container ${isRecording ? 'recording-mode' : ''}`}>
@@ -280,11 +342,50 @@ function App() {
                         <polyline points="7 7 17 7 17 17"></polyline>
                     </svg>
                 </a>
+
+                {/* 模式切换 (新增) */}
+                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
+                    <div className="demo-switch-btn" style={{ background: 'var(--bg-card)', padding: '4px', borderRadius: '8px', border: '1px solid var(--border)' }}>
+                        <button
+                            style={{
+                                border: 'none',
+                                background: heroMode === 'price' ? 'var(--accent)' : 'transparent',
+                                color: heroMode === 'price' ? 'white' : 'var(--text-muted)',
+                                padding: '4px 12px',
+                                borderRadius: '6px',
+                                cursor: 'pointer',
+                                fontWeight: 500,
+                                fontSize: '0.9rem',
+                                transition: 'all 0.2s'
+                            }}
+                            onClick={() => setHeroMode('price')}
+                        >
+                            {t.price}
+                        </button>
+                        <button
+                            style={{
+                                border: 'none',
+                                background: heroMode === 'text' ? 'var(--accent)' : 'transparent',
+                                color: heroMode === 'text' ? 'white' : 'var(--text-muted)',
+                                padding: '4px 12px',
+                                borderRadius: '6px',
+                                cursor: 'pointer',
+                                fontWeight: 500,
+                                fontSize: '0.9rem',
+                                transition: 'all 0.2s'
+                            }}
+                            onClick={() => setHeroMode('text')}
+                        >
+                            {t.text}
+                        </button>
+                    </div>
+                </div>
+
                 <div className="price-value">
-                    <span className="price-currency">$</span>
+                    {heroMode === 'price' && <span className="price-currency">$</span>}
                     <Ticker
-                        value={heroPrice.toFixed(2)}
-                        characterLists={PRICE_CHARS}
+                        value={heroValue}
+                        characterLists={heroChars}
                         duration={animDuration}
                         easing={easing}
                         charWidth={charWidth}
@@ -397,7 +498,6 @@ function App() {
                 </div>
 
                 {/* 现实场景模拟 */}
-                {/* 现实场景模拟 */}
                 <div className="live-data-section">
                     <div className="section-title">
                         <span className="live-dot"></span>
@@ -423,18 +523,23 @@ function App() {
                             </div>
                         </div>
 
-                        {/* 2. 成交量 */}
-                        <div className="scene-card volume">
+                        {/* 2. 系统更新 */}
+                        <div className="scene-card install">
                             <div className="scene-icon">
                                 <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z" />
+                                    <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
                                 </svg>
                             </div>
-                            <div className="scene-title">{t.scenes.volume}</div>
-                            <div className="scene-content volume-display">
+                            <div className="scene-title">{t.scenes.install}</div>
+                            <div className="scene-content install-display" style={{ fontSize: '1.2rem', color: '#6366f1' }}>
                                 <Ticker
-                                    value={volume.toLocaleString()}
-                                    characterLists={VOLUME_CHARS}
+                                    value={installStatus}
+                                    charWidth={0.8}
+                                    characterLists={[
+                                        TickerUtils.provideAlphabeticalList(),
+                                        TickerUtils.provideNumberList(),
+                                        ' .%'
+                                    ]}
                                     duration={500}
                                 />
                             </div>
@@ -459,18 +564,25 @@ function App() {
                             </div>
                         </div>
 
-                        {/* 4. 比分 */}
-                        <div className="scene-card score">
+                        {/* 4. 音乐播放器 */}
+                        <div className="scene-card music">
                             <div className="scene-icon">
-                                <svg fill="currentColor" width="32" height="32" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
-                                    <path id="Football" d="M66.091,75h-.434a24.926,24.926,0,0,1-8.332-1.544q-.532-.2-1.056-.418c-.229-.1-.456-.2-.682-.3l-.022-.01-.083-.039a25,25,0,0,1-6.2-4.1l-.069-.062-.011-.01q-.446-.405-.876-.835-.448-.448-.872-.916a25.022,25.022,0,0,1-4.1-6.173q-.2-.424-.382-.857-.139-.328-.268-.659a.307.307,0,0,0-.012-.031c-.012-.03-.023-.06-.034-.09a24.851,24.851,0,0,1-1.613-7.569c0-.008,0-.016,0-.024l0-.063c0-.038,0-.076-.006-.114v-.014c-.007-.143-.012-.286-.016-.43Q41,50.369,41,50a24.937,24.937,0,0,1,1.646-8.941.25.25,0,0,0,.009-.023c.008-.02.016-.04.023-.061s.022-.056.033-.084l.014-.035c.077-.2.157-.391.239-.587.037-.087.075-.175.113-.261l.024-.057.023-.052a25.041,25.041,0,0,1,4.434-6.78l.053-.058.018-.019q.337-.366.692-.72.423-.423.861-.822l.058-.053.007-.007a25.043,25.043,0,0,1,6.235-4.128l.069-.032.037-.016q.336-.154.678-.3.4-.167.8-.32A24.907,24.907,0,0,1,65.723,25h.552a24.915,24.915,0,0,1,9.288,1.893l.056.022.021.009.092.039.272.117.013.005.1.046.071.031.042.019a25.031,25.031,0,0,1,6.627,4.358l.01.009.057.051c.254.235.5.475.751.721s.459.468.68.707a25.024,25.024,0,0,1,4.514,6.862l.028.063c.007.016.015.034.022.05.018.04.035.079.052.119,0,0,0,0,0,0,.021.047.041.094.06.14l.045.107.01.023.036.086.025.061a.069.069,0,0,0,0,.01,25.09,25.09,0,0,1,.085,18.676c-.01.027-.021.054-.032.081,0,.01-.009.021-.013.031-.052.13-.106.258-.16.387q-.186.441-.389.873c0,.007-.007.016-.011.022-.014.028-.026.056-.04.083a25.059,25.059,0,0,1-4.089,6.1q-.4.443-.83.869c-.251.251-.506.5-.765.734l-.007.005-.075.069a25.023,25.023,0,0,1-6.594,4.328l-.051.023-.06.027-.114.05h0c-.092.04-.184.08-.276.119l-.1.041A24.911,24.911,0,0,1,66.337,75h-.247Zm-6.853-4.063a22.04,22.04,0,0,0,13.518,0l2.128-6.782L70.485,58H61.515l-4.4,6.156ZM75.169,70A22.1,22.1,0,0,0,82,65.087l-5.263-.078ZM50,65.08A22.093,22.093,0,0,0,56.828,70L55.267,65Zm33.651-1.957A21.886,21.886,0,0,0,88,50c0-.116,0-.232,0-.347l-6.344-4.361-6.836,3.418L72.11,56.833l4.417,6.184ZM44,49.655q0,.173,0,.346a21.881,21.881,0,0,0,4.345,13.112l7.136-.107,4.409-6.173-2.708-8.124L50.356,45.3Zm15.174-1.287L61.721,56h8.558l2.544-7.632L66,43.25ZM44.189,47.113l4.6-3.159-1.775-5.065A21.858,21.858,0,0,0,44.189,47.113Zm39.022-3.165,4.6,3.162a21.842,21.842,0,0,0-2.83-8.222ZM57.894,46.829,65,41.5v-8l-5.869-4.4a22.085,22.085,0,0,0-10.711,7.69l2.254,6.432Zm16.212,0,7.226-3.613,2.249-6.428A22.1,22.1,0,0,0,72.869,29.1L67,33.5v8ZM61.592,28.444,66,31.75l4.409-3.307a22.124,22.124,0,0,0-8.817,0Z" transform="translate(-41 -25)" />
+                                <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
                                 </svg>
                             </div>
-                            <div className="scene-title">{t.scenes.score}</div>
-                            <div className="scene-content scoreboard">
-                                <Ticker value={scoreA.toString()} characterLists={[NUMBERS]} duration={500} />
-                                <span className="score-separator">:</span>
-                                <Ticker value={scoreB.toString()} characterLists={[NUMBERS]} duration={500} />
+                            <div className="scene-title">{t.scenes.music}</div>
+                            <div className="scene-content music-display" style={{ fontSize: '1.2rem', whiteSpace: 'nowrap' }}>
+                                <Ticker
+                                    value={musicStatus}
+                                    charWidth={0.8}
+                                    characterLists={[
+                                        TickerUtils.provideAlphabeticalList(),
+                                        TickerUtils.provideNumberList(),
+                                        ' .%-'
+                                    ]}
+                                    duration={600}
+                                />
                             </div>
                         </div>
                     </div>
@@ -498,7 +610,6 @@ function App() {
             </main >
 
             <footer className="footer compact">
-
                 <div className="copyright">
                     © 2025 SmartTicker. MIT License.
                 </div>

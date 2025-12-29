@@ -162,11 +162,18 @@
 <body>
     <div id="app">
         <div class="price-hero">
-            <div class="price-label">价格</div>
+            <div class="control-buttons" style="justify-content: center; margin-bottom: 2rem;">
+                <button :class="{ active: mode === 'price' }" @click="mode = 'price'" style="padding: 0.5rem 1.5rem;">数字
+                    / Price</button>
+                <button :class="{ active: mode === 'text' }" @click="mode = 'text'" style="padding: 0.5rem 1.5rem;">文本 /
+                    Text</button>
+            </div>
+
             <div class="price-value">
-                <span class="price-currency">$</span>
-                <ticker-component :value="heroPrice" :duration="animDuration" :easing="easing" :char-width="charWidth"
-                    :character-lists="['0123456789.,']"></ticker-component>
+                <span v-if="mode === 'price'" class="price-currency">$</span>
+                <ticker-component :value="heroValue" :duration="animDuration" :easing="easing" :char-width="charWidth"
+                    :character-lists="currentCharacterLists">
+                </ticker-component>
             </div>
 
             <div class="price-controls">
@@ -465,10 +472,23 @@
                     return columns.value.map(col => {
                         const { charIdx, delta } = applyProgress(col, progress.value);
                         const logicalWidth = col.sourceWidth + (col.targetWidth - col.sourceWidth) * progress.value;
-                        const width = logicalWidth * props.charWidth * 0.8;
+
+                        // Full-width character interpolation logic
+                        const list = col.charList || [];
+                        const isFW = (c) => c && c.length > 0 && c.charCodeAt(0) > 255;
+                        const getW = (c) => isFW(c) ? 1.1 : 0.8;
+
+                        const startChar = list[col.startIndex] || '';
+                        const endChar = list[col.endIndex] || '';
+                        const w1 = getW(startChar);
+                        const w2 = getW(endChar);
+                        const baseW = w1 + (w2 - w1) * progress.value;
+
+                        const width = logicalWidth * props.charWidth * baseW;
+
                         if (width <= 0) return { width, chars: [] };
                         const chars = [];
-                        const list = col.charList || [];
+
                         const deltaEm = delta * charHeight;
                         const add = (idx, offsetMod, keyPrefix) => {
                             if (idx >= 0 && idx < list.length) {
@@ -489,11 +509,21 @@
         createApp({
             components: { TickerComponent },
             setup() {
+                const mode = ref('price');
                 const priceSequence = ['73.18', '76.58', '173.50', '9.1'];
-                const heroPrice = ref(priceSequence[0]);
+                const textSequence = [
+                    'Smart Ticker',
+                    'Small Diff',
+                    '哈基米 Dif@#$',
+                    '硅基生命 %@#$',
+                    '宇宙生命 Smart',
+                ];
+
+                const heroValue = ref(priceSequence[0]);
                 const animDuration = ref(800);
                 const easing = ref('easeInOut');
                 const charWidth = ref(1);
+
                 const durationOptions = [400, 800, 1200];
                 const widthOptions = [0.8, 1, 1.2];
                 const easingOptions = [
@@ -502,18 +532,30 @@
                     { name: 'bounce', label: '回弹' },
                 ];
 
+                const currentCharacterLists = computed(() => {
+                    if (mode.value === 'price') return ['0123456789.,'];
+                    // Provide alphabet, upcase, numbers, symbols
+                    const alpha = 'abcdefghijklmnopqrstuvwxyz';
+                    const symbols = ' .%v-@#$';
+                    return [alpha, alpha.toUpperCase(), '0123456789', symbols];
+                });
+
                 let interval;
 
-                watch(animDuration, (newDur) => {
-                    if (interval) clearInterval(interval);
+                watch([animDuration, mode], () => {
                     startInterval();
                 });
 
                 const startInterval = () => {
-                    let priceIdx = 0;
+                    if (interval) clearInterval(interval);
+                    let idx = 0;
+                    // Reset to first value
+                    heroValue.value = mode.value === 'price' ? priceSequence[0] : textSequence[0];
+
                     interval = setInterval(() => {
-                        priceIdx = (priceIdx + 1) % priceSequence.length;
-                        heroPrice.value = priceSequence[priceIdx];
+                        idx++;
+                        const seq = mode.value === 'price' ? priceSequence : textSequence;
+                        heroValue.value = seq[idx % seq.length];
                     }, animDuration.value + 1000);
                 };
 
@@ -526,7 +568,9 @@
                 });
 
                 return {
-                    heroPrice,
+                    mode,
+                    heroValue,
+                    currentCharacterLists,
                     animDuration,
                     easing,
                     charWidth,

@@ -19,7 +19,7 @@ export class TickerCharacterList {
     private characterIndicesMap: Map<string, number>;
 
     constructor(characterList: string) {
-        const charsArray = characterList.split('');
+        const charsArray = [...characterList];
         const length = charsArray.length;
         this.numOriginalCharacters = length;
         this.characterIndicesMap = new Map();

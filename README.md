@@ -6,7 +6,7 @@
 <h1 align="center">Smart Ticker</h1>
 
 <p align="center">
-  高性能智能文本差异滚动组件，基于 Levenshtein diff 算法，支持多字符集，适用于React/Vue，<a href="https://tombcato.github.io/smart-ticker/">官网演示></a>
+  高性能智能文本差异滚动组件，支持中英、数字、字母、符号、Emoji等多种字符集，基于 Levenshtein diff 算法，适用于React/Vue，<a href="https://tombcato.github.io/smart-ticker/">官网演示></a>
 </p>
 
 <p align="center">
@@ -15,6 +15,9 @@
 
 <p align="center">
   <img src="./smartticker.gif" alt="Demo" width="600" />
+</p>
+<p align="center">
+  <img src="./smartticker2.gif" alt="Demo" width="600" />
 </p>
 
 <p align="center">
@@ -26,14 +29,11 @@
 
 
 ## ✨ 特性
-
-- **智能差异动画** - 只有变化的字符会滚动，相同的字符保持静止
-- **平滑中断** - 动画过程中值变化时，从当前位置无缝衔接到新目标
-- **多种缓动曲线** - 支持 `linear`、`easeInOut`、`bounce` 等多种动画效果
-- **字符宽度可调** - 通过 `charWidth` 属性控制字符间距
-- **多字符集支持** - 支持数字、字母、符号等多种字符集，可混合使用
-- **双框架支持** - 提供 React 组件和 Vue 组件
-- **高性能** - 使用 `requestAnimationFrame` 和 `React.memo` 优化渲染
+| | |
+| :--- | :--- |
+| **🌏 多字符集支持**<br>支持中英、数字、Emoji等混合滚动，基于 Unicode 宽度自动调整间距 | **🧠 智能差异动画**<br>Levenshtein 算法计算最小变更路径，相同的字符保持静止 |
+| **⚡ 平滑中断**<br>动画过程中值突变时，从当前动态位置无缝流向新目标 | **📈 丰富动效**<br>内置 `linear`, `bounce`, `easeInOut` 等缓动，支持 `charWidth` 微调 |
+| **🦄 双框架支持**<br>提供 React (Hooks) 和 Vue 3 (Composition) 组件，API 统一 | **🚀 极致性能**<br>基于 `RAF` 驱动，无多余 DOM 操作，适合高频数据流场景 |
 
 ## 📦 安装
 
@@ -155,8 +155,32 @@ const price = ref('73.18');
 import { TickerUtils } from './components/Ticker';
 
 TickerUtils.provideNumberList()        // '0123456789'
-TickerUtils.provideAlphabeticalList()  // 'abcdefghijklmnopqrstuvwxyz'
-TickerUtils.provideHexadecimalList()   // '0123456789ABCDEF'
+TickerUtils.provideAlphabeticalList()  // 'abc...zABC...Z'
+
+### 🧩 字符集配置详解
+
+`characterLists` 是控制 Ticker 动画逻辑的核心配置。它接受一个字符串数组，数组的每一项代表一组**“可以互相滚动”**的字符。
+
+**基本规则：**
+1.  **同组滚动**：如果旧字符和新字符在同一个字符串中（例如 `0` 变 `9` 在 `'0123456789'` 中），它们会产生滚动动画。
+2.  **跨组替换**：如果它们不在同一组（例如 `a` 变 `1`），或者任何一个字符不在配置列表中（例如汉字），它们会原地切换（Switch），不会产生滚动。
+
+**配置技巧：**
+
+*   **默认全字母**：`TickerUtils.provideAlphabeticalList()` 默认包含 `a-z` 和 `A-Z`。如果你希望大小写之间可以滚动（如 `a` -> `A`），使用它即可。
+*   **由于物理隔离**：如果你不希望小写字母滚动变成大写字母（希望它们直接切换），请将它们配置为两个独立的字符串，例如 `['abc...', 'ABC...']`。
+
+**示例：**
+
+```javascript
+// 场景：数字、字母（大小写隔离）、符号
+characterLists={[
+  'abcdefghijklmnopqrstuvwxyz', // 小写组
+  'ABCDEFGHIJKLMNOPQRSTUVWXYZ', // 大写组
+  '0123456789',                 // 数字组
+  '.,!@#$%^&*'                  // 符号组
+]}
+```
 ```
 
 ## 💻 运行演示

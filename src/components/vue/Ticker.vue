@@ -4,7 +4,7 @@
       v-for="(col, i) in renderedColumns"
       :key="i"
       class="ticker-column"
-      :style="{ width: `${col.width * 0.8 * charWidth}em` }"
+      :style="{ width: `${col.width * (col.baseW || 0.8) * charWidth}em` }"
     >
       <div
         v-for="charObj in col.chars"
@@ -75,7 +75,7 @@ watch(() => props.value, (newValue, oldValue) => {
         currentCols = currentCols.map(c => applyProgress(c, progress.value, true).col);
     }
 
-    const targetChars = newValue.split('');
+    const targetChars = [...newValue];
     const sourceChars = currentCols.map(c => c.currentChar);
     const actions = computeColumnActions(sourceChars, targetChars, supported.value);
 
@@ -163,7 +163,17 @@ const renderedColumns = computed(() => {
         add(charIdx + 1, -charHeight, 'n');
         add(charIdx - 1, charHeight, 'p');
 
-        return { width, chars };
+        // Check for full-width char
+        const isFW = (c: string) => c && c.length > 0 && c.charCodeAt(0) > 255;
+        const getW = (c: string) => isFW(c) ? 1.25 : 0.8;
+
+        const startChar = list[col.startIndex] || '';
+        const endChar = list[col.endIndex] || ''; // endIndex not targetIndex
+        const w1 = getW(startChar);
+        const w2 = getW(endChar);
+        const baseW = w1 + (w2 - w1) * progress.value;
+
+        return { width, chars, baseW };
     }).filter(c => c.width > 0);
 });
 

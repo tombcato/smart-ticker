@@ -5,9 +5,7 @@
 
 <h1 align="center">Smart Ticker</h1>
 
-<p align="center">
-  High-performance smart text ticker component based on Levenshtein diff algorithm. Supports multiple charsets, works with React/Vue. <a href="https://tombcato.github.io/smart-ticker/">Live Demo ></a>
-</p>
+  High-performance smart text ticker component based on Levenshtein diff algorithm. Supports CJK, numbers, letters, emojis, and mixed charsets. <a href="https://tombcato.github.io/smart-ticker/">Live Demo ></a>
 
 <p align="center">
   <a href="./README.md">简体中文</a> | <strong>English</strong>
@@ -15,6 +13,9 @@
 
 <p align="center">
   <img src="./smartticker.gif" alt="Demo" width="600" />
+</p>
+<p align="center">
+  <img src="./smartticker2.gif" alt="Demo" width="600" />
 </p>
 
 <p align="center">
@@ -25,15 +26,11 @@
 </p>
 
 
-## ✨ Features
-
-- **Smart Diff Animation** - Only changed characters scroll, identical ones remain static.
-- **Smooth Interruption** - Seamlessly transitions to new targets if value changes during animation.
-- **Custom Easing** - Supports `linear`, `easeInOut`, `bounce` and more.
-- **Adjustable Char Width** - Control character spacing via `charWidth` prop.
-- **Multi-Charset** - Supports numbers, letters, symbols, and mixed usage.
-- **Dual Framework Support** - Provides both React and Vue components.
-- **High Performance** - Optimized with `requestAnimationFrame` and `React.memo`.
+| | |
+| :--- | :--- |
+| **🌏 Multi-Charset Support**<br>Supports CJK, Numbers, Emojis, and mixed text rolling. Auto-adjusts spacing based on Unicode width. | **🧠 Smart Diff Animation**<br>Uses Levenshtein algorithm to find the shortest change path; identical characters remain static. |
+| **⚡ Smooth Interruption**<br>Seamlessly transitions to new targets if the value changes dynamically during animation. | **📈 Rich Motion**<br>Built-in `linear`, `bounce`, `easeInOut` easings. Supports `charWidth` for fine-tuning. |
+| **🦄 Dual Framework**<br>Provides both React (Hooks) and Vue 3 (Composition) components with a unified API. | **🚀 High Performance**<br>Powered by `RAF`, removing DOM overhead, optimized for high-frequency data streams. |
 
 ## 📦 Installation
 
@@ -155,8 +152,31 @@ The component uses the system monospace stack by default. To use a custom font (
 import { TickerUtils } from './components/Ticker';
 
 TickerUtils.provideNumberList()        // '0123456789'
-TickerUtils.provideAlphabeticalList()  // 'abcdefghijklmnopqrstuvwxyz'
-TickerUtils.provideHexadecimalList()   // '0123456789ABCDEF'
+TickerUtils.provideAlphabeticalList()  // 'abc...zABC...Z'
+
+### 🧩 Character Configuration
+
+`characterLists` controls the core animation logic. It accepts an array of strings, where each string represents a group of characters that can **scroll into each other**.
+
+**Rules:**
+1.  **Scroll**: If both the old and new characters belong to the same group string (e.g., `0` to `9` in `'0123456789'`), they will scroll.
+2.  **Switch**: If they are in different groups, or if a character is not in any list (e.g., Chinese characters), they will switch instantly without scrolling.
+
+**Configuration Tips:**
+
+*   `TickerUtils.provideAlphabeticalList()` includes both `a-z` and `A-Z`.
+*   To prevent scrolling between cases (e.g., `a` -> `A`), provide them as separate strings: `['abc...', 'ABC...']`.
+
+**Example:**
+
+```javascript
+characterLists={[
+  'abcdefghijklmnopqrstuvwxyz', // Lowercase group
+  'ABCDEFGHIJKLMNOPQRSTUVWXYZ', // Uppercase group
+  '0123456789',                 // Number group
+  '.,!@#$%^&*'                  // Symbol group
+]}
+```
 ```
 
 ## 💻 Running Demos

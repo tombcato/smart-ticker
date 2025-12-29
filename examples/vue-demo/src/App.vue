@@ -1,21 +1,52 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
-import { Ticker } from '@tombcato/smart-ticker/vue'
+import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
+import { Ticker, TickerUtils } from '@tombcato/smart-ticker/vue'
 import '@tombcato/smart-ticker/style.css'
 
-const value = ref(173.50)
+type DemoMode = 'price' | 'text'
+
+const mode = ref<DemoMode>('price')
+const value = ref<string | number>(173.50)
 const charWidth = ref(1)
 const duration = ref(800)
 const easing = ref('easeInOut')
 
 let timer: number
+
+function startTimer() {
+  clearInterval(timer)
+  if (mode.value === 'price') {
+    const prices = [73.18, 76.58, 173.50, 9.10]
+    let idx = 0
+    value.value = prices[0]
+    timer = setInterval(() => {
+      idx = (idx + 1) % prices.length
+      value.value = prices[idx]
+    }, 2000)
+  } else {
+    // 精心设计的 Diff 演示序列
+    const words = [
+        'Smart Ticker',
+        'Small Diff',
+        '哈基米 Dif@#$',
+        '硅基生命 %@#$',
+        '宇宙生命 Smart',
+    ]
+    let idx = 0
+    value.value = words[0]
+    timer = setInterval(() => {
+      idx = (idx + 1) % words.length
+      value.value = words[idx]
+    }, 2000)
+  }
+}
+
+watch(mode, () => {
+  startTimer()
+})
+
 onMounted(() => {
-  const prices = [73.18, 76.58, 173.50, 9.10]
-  let idx = 0
-  timer = setInterval(() => {
-    idx = (idx + 1) % prices.length
-    value.value = prices[idx]
-  }, 2000)
+  startTimer()
 })
 
 onUnmounted(() => {
@@ -30,7 +61,27 @@ const easingOptions = [
   { key: 'bounce', label: '回弹' },
 ]
 
-const priceChars = ['0123456789.,']
+const currentCharacterLists = computed(() => {
+  return mode.value === 'price'
+    ? ['0123456789.,']
+    : [
+        TickerUtils.provideAlphabeticalList(), 
+        TickerUtils.provideAlphabeticalList().toUpperCase(),
+        TickerUtils.provideNumberList(),
+        ' .%v-@#$'
+      ]
+})
+
+const displayValue = computed(() => {
+  return mode.value === 'price' ? Number(value.value).toFixed(2) : String(value.value)
+})
+
+// For code display
+const charListCode = computed(() => {
+  return mode.value === 'price' 
+    ? "['0123456789.,']" 
+    : "[TickerUtils.provideAlphabeticalList()]"
+})
 </script>
 
 <template>
@@ -44,19 +95,28 @@ const priceChars = ['0123456789.,']
     </header>
 
     <div class="ticker-display">
-      <span class="currency-symbol">$</span>
+      <span v-if="mode === 'price'" class="currency-symbol">$</span>
       <div class="ticker-main">
         <Ticker
-          :value="value.toFixed(2)"
+          :value="displayValue"
           :duration="duration"
           :easing="easing"
           :char-width="charWidth"
-          :character-lists="priceChars"
+          :character-lists="currentCharacterLists"
         />
       </div>
     </div>
 
     <div class="controls">
+      <!-- 模式切换 -->
+      <div class="control-group">
+        <div class="label">演示模式</div>
+        <div class="options">
+          <button :class="{ active: mode === 'price' }" @click="mode = 'price'">数字</button>
+          <button :class="{ active: mode === 'text' }" @click="mode = 'text'">文本</button>
+        </div>
+      </div>
+
       <!-- 字符宽度控制 -->
       <div class="control-group">
         <div class="label">字符宽度</div>
@@ -105,15 +165,15 @@ const priceChars = ['0123456789.,']
 
     <footer class="code-section">
       <h2>💻 使用代码</h2>
-      <pre><code>import { Ticker } from '@tombcato/smart-ticker/vue'
+      <pre><code>import { Ticker, TickerUtils } from '@tombcato/smart-ticker/vue'
 import '@tombcato/smart-ticker/style.css'
 
 &lt;Ticker
-  value="{{ value.toFixed(2) }}"
+  value="{{ displayValue }}"
   :duration="{{ duration }}"
   easing="{{ easing }}"
   :char-width="{{ charWidth }}"
-  :character-lists="['0123456789.,']"
+  :character-lists="{{ charListCode }}"
 /&gt;</code></pre>
     </footer>
   </div>
