@@ -9,7 +9,7 @@
         "preview": "vite preview"
     },
     "dependencies": {
-        "@tombcato/smart-ticker": "file:../..",
+        "@tombcato/smart-ticker": "^1.0.4",
         "vue": "^3.4.0"
     },
     "devDependencies": {
