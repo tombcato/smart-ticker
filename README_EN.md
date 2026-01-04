@@ -140,11 +140,16 @@ The component uses the system monospace stack by default. To use a custom font (
 |------|------|--------|------|
 | `value` | `string` | - | The text value to display (Required) |
 | `duration` | `number` | `500` | Animation duration (ms) |
-| `easing` | `string` | `'easeInOut'` | Easing function: `linear`, `easeIn`, `easeOut`, `easeInOut`, `bounce` |
+| `easing` | `EasingName \| function` | `'easeInOut'` | Easing: `linear`, `easeIn`, `easeOut`, `easeInOut`, `bounce`, or custom `(t: number) => number` |
 | `direction` | `string` | `'ANY'` | Scroll direction: `UP`, `DOWN`, `ANY` (shortest path) |
 | `charWidth` | `number` | `1` | Character width multiplier (base 0.8em) |
 | `characterLists` | `string[]` | `['0123456789']` | Allowed character sets |
 | `className` | `string` | `''` | Custom CSS class name |
+| `animateOnMount` | `boolean` | `false` | Animate on initial render |
+| `disabled` | `boolean` | `false` | Disable animation, show final value immediately |
+| `prefix` | `string` | - | Static prefix (not animated) |
+| `suffix` | `string` | - | Static suffix (not animated) |
+| `onAnimationEnd` | `() => void` | - | Callback when animation ends (Vue: `@animation-end`) |
 
 ### Built-in Character Lists
 
@@ -236,6 +241,10 @@ smart-ticker/
 - **Language**: TypeScript
 - **Frameworks**: React 18 / Vue 3
 - **Styling**: CSS Variables + Responsive Design
+
+## 📝 Changelog
+
+See [CHANGELOG_EN.md](./CHANGELOG_EN.md) for version history.
 
 ## 📄 License
 

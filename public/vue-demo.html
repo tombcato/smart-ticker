@@ -385,11 +385,13 @@
         const TickerComponent = {
             template: `
                 <div class="ticker" :class="className">
-                    <div v-for="(col, i) in renderedColumns" :key="i" class="ticker-column" :style="{ width: col.width + 'em' }">
+                    <span v-if="prefix" class="ticker-prefix">{{ prefix }}</span>
+                    <div v-for="(col, i) in renderedColumns" :key="i" class="ticker-column" :style="{ width: col.width + 'em', opacity: col.opacity }">
                         <div v-for="charObj in col.chars" :key="charObj.key" class="ticker-char" :style="{ transform: 'translateY(' + charObj.offset + 'em)' }">
                             {{ charObj.char === '${EMPTY_CHAR}' ? '\u00A0' : charObj.char }}
                         </div>
                     </div>
+                    <span v-if="suffix" class="ticker-suffix">{{ suffix }}</span>
                 </div>
             `,
             props: {
@@ -397,11 +399,15 @@
                 characterLists: { type: Array, default: () => ['0123456789'] },
                 duration: { type: Number, default: 500 },
                 direction: { type: String, default: 'ANY' },
-                easing: { type: String, default: 'easeInOut' },
+                easing: { type: [String, Function], default: 'easeInOut' },
                 className: { type: String, default: '' },
                 charWidth: { type: Number, default: 1 },
+                disabled: { type: Boolean, default: false },
+                prefix: { type: String, default: '' },
+                suffix: { type: String, default: '' },
             },
-            setup(props) {
+            emits: ['animationEnd'],
+            setup(props, { emit }) {
                 const columns = ref([]);
                 const progress = ref(1);
                 let animId;
@@ -441,10 +447,21 @@
                     }
 
                     columns.value = result;
+                    // disabled 跳过动画
+                    if (props.disabled) {
+                        progress.value = 1;
+                        const final = result.map(c => applyProgress(c, 1).col).filter(c => c.currentWidth > 0);
+                        columns.value = final;
+                        return;
+                    }
+
                     progress.value = 0;
                     const start = performance.now();
                     const dur = props.duration;
-                    const easeFn = easingFunctions[props.easing] || easingFunctions.linear;
+                    // 支持自定义 easing 函数
+                    const easeFn = typeof props.easing === 'function'
+                        ? props.easing
+                        : easingFunctions[props.easing] || easingFunctions.linear;
                     let lastUpdate = 0;
 
                     const animate = (now) => {
@@ -460,10 +477,24 @@
                             columns.value = final;
                             progress.value = 1;
                             animId = undefined;
+                            // emit animationEnd
+                            emit('animationEnd');
                         }
                     };
                     animId = requestAnimationFrame(animate);
-                }, { immediate: true });
+                }, { immediate: false });  // 首次不触发动画
+
+                // 首次渲染：直接显示初始值
+                const initValue = props.value;
+                if (initValue) {
+                    const targetChars = initValue.split('');
+                    const result = targetChars.map(char => {
+                        const col = setTarget(createColumn(), char, lists.value, props.direction);
+                        return applyProgress(col, 1).col;
+                    }).filter(c => c.currentWidth > 0);
+                    columns.value = result;
+                    progress.value = 1;
+                }
 
                 onUnmounted(() => { if (animId) cancelAnimationFrame(animId); });
 
@@ -473,10 +504,19 @@
                         const { charIdx, delta } = applyProgress(col, progress.value);
                         const logicalWidth = col.sourceWidth + (col.targetWidth - col.sourceWidth) * progress.value;
 
-                        // Full-width character interpolation logic
+                        // Full-width character detection (emoji + CJK)
                         const list = col.charList || [];
-                        const isFW = (c) => c && c.length > 0 && c.charCodeAt(0) > 255;
-                        const getW = (c) => isFW(c) ? 1.1 : 0.8;
+                        const isFW = (c) => {
+                            if (!c || c.length === 0) return false;
+                            const code = c.codePointAt(0) || 0;
+                            return (
+                                (code >= 0x3000 && code <= 0x9FFF) ||  // CJK
+                                (code >= 0xAC00 && code <= 0xD7AF) ||  // 韩文
+                                (code >= 0xFF00 && code <= 0xFFEF) ||  // 全角 ASCII
+                                (code >= 0x1F300 && code <= 0x1FAFF)   // Emoji
+                            );
+                        };
+                        const getW = (c) => isFW(c) ? 1.25 : 0.8;
 
                         const startChar = list[col.startIndex] || '';
                         const endChar = list[col.endIndex] || '';
@@ -498,7 +538,13 @@
                         add(charIdx, 0, 'c');
                         add(charIdx + 1, -charHeight, 'n');
                         add(charIdx - 1, charHeight, 'p');
-                        return { width, chars };
+
+                        // Alpha 渐变：新增/删除列
+                        const isDeleting = col.targetWidth === 0 && col.sourceWidth > 0;
+                        const isInserting = col.sourceWidth === 0 && col.targetWidth > 0;
+                        const opacity = isDeleting ? 1 - progress.value : isInserting ? progress.value : 1;
+
+                        return { width, chars, opacity };
                     }).filter(c => c.width > 0);
                 });
 

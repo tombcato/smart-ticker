@@ -31,7 +31,16 @@ export default defineConfig({
             },
         },
         rollupOptions: {
-            external: ['react', 'react-dom', 'react/jsx-runtime', 'vue'],
+            external: [
+                'react',
+                'react-dom',
+                'react/jsx-runtime',
+                'react/jsx-dev-runtime',
+                'react-dom/client',
+                /^react\/.*/,
+                /^react-dom\/.*/,
+                'vue',
+            ],
             output: {
                 globals: {
                     react: 'React',

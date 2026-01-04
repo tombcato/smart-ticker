@@ -15,12 +15,27 @@ import {
     setTarget,
     applyProgress,
     easingFunctions,
+    EasingName,
     ACTION_INSERT,
     ACTION_SAME,
 } from '../core/TickerCore';
 
 // 导出 Utils 供外部使用
 export { TickerUtils };
+
+// 全角字符检测（提取到组件外避免每帧重复创建函数）
+const isFW = (c: string) => {
+    if (!c || c.length === 0) return false;
+    // 使用 codePointAt 正确处理 emoji（代理对）
+    const code = c.codePointAt(0) || 0;
+    return (
+        (code >= 0x3000 && code <= 0x9FFF) ||  // CJK 标点 + 汉字
+        (code >= 0xAC00 && code <= 0xD7AF) ||  // 韩文
+        (code >= 0xFF00 && code <= 0xFFEF) ||  // 全角 ASCII
+        (code >= 0x1F300 && code <= 0x1FAFF)   // Emoji 范围
+    );
+};
+const getW = (c: string) => isFW(c) ? 1.25 : 0.8;
 
 // ============================================================================
 // Ticker Component
@@ -30,9 +45,14 @@ export interface TickerProps {
     characterLists?: string[];
     duration?: number;
     direction?: ScrollingDirection;
-    easing?: string;
+    easing?: EasingName | ((t: number) => number);
     className?: string;
     charWidth?: number;
+    animateOnMount?: boolean;
+    disabled?: boolean;
+    prefix?: string;
+    suffix?: string;
+    onAnimationEnd?: () => void;
 }
 
 export const Ticker: React.FC<TickerProps> = ({
@@ -40,9 +60,14 @@ export const Ticker: React.FC<TickerProps> = ({
     characterLists: charListStrings = [TickerUtils.provideNumberList()],
     duration = 500,
     direction = 'ANY',
-    easing = 'easeInOut', // Robinhood 默认: AccelerateDecelerateInterpolator
+    easing = 'easeInOut',
     className = '',
     charWidth = 1,
+    animateOnMount = false,
+    disabled = false,
+    prefix,
+    suffix,
+    onAnimationEnd,
 }) => {
     const [columns, setColumns] = useState<ColumnState[]>([]);
     const [progress, setProgress] = useState(1);
@@ -65,11 +90,15 @@ export const Ticker: React.FC<TickerProps> = ({
     const directionRef = useRef(direction);
     const durationRef = useRef(duration);
     const easingRef = useRef(easing);
+    const disabledRef = useRef(disabled);
+    const onAnimationEndRef = useRef(onAnimationEnd);
     listsRef.current = lists;
     supportedRef.current = supported;
     directionRef.current = direction;
     durationRef.current = duration;
     easingRef.current = easing;
+    disabledRef.current = disabled;
+    onAnimationEndRef.current = onAnimationEnd;
 
     // 主要逻辑：value 变化时处理
     useEffect(() => {
@@ -115,13 +144,16 @@ export const Ticker: React.FC<TickerProps> = ({
         colsRef.current = result;
         setColumns(result);
 
-        // 动画
-        if (!isFirstRef.current && result.length > 0) {
+        // 动画：首次渲染时根据 animateOnMount 决定是否动画，disabled 跳过动画
+        if (!disabledRef.current && (!isFirstRef.current || animateOnMount) && result.length > 0) {
             progressRef.current = 0;
             setProgress(0);
             const start = performance.now();
             const dur = durationRef.current;
-            const easeFn = easingFunctions[easingRef.current] || easingFunctions.linear;
+            // 支持自定义 easing 函数
+            const easeFn = typeof easingRef.current === 'function'
+                ? easingRef.current
+                : easingFunctions[easingRef.current as EasingName] || easingFunctions.linear;
             let lastUpdate = 0;
 
             const animate = (now: number) => {
@@ -145,6 +177,8 @@ export const Ticker: React.FC<TickerProps> = ({
                     colsRef.current = final;
                     setColumns(final);
                     animRef.current = undefined;
+                    // 触发 onAnimationEnd 回调
+                    onAnimationEndRef.current?.();
                 }
             };
             animRef.current = requestAnimationFrame(animate);
@@ -203,10 +237,7 @@ export const Ticker: React.FC<TickerProps> = ({
                 );
             }
 
-            // 动态计算字符基础宽度：全角字符 1.1em，半角 0.8em
-            // 使用线性插值 (Lerp) 避免突变跳动
-            const isFW = (c: string) => c && c.length > 0 && c.charCodeAt(0) > 255;
-            const getW = (c: string) => isFW(c) ? 1.25 : 0.8;
+            // 动态计算字符基础宽度
 
             // 安全获字符
             const startChar = list[col.startIndex];
@@ -216,15 +247,29 @@ export const Ticker: React.FC<TickerProps> = ({
             const w2 = getW(endChar);
             const baseW = w1 + (w2 - w1) * progress;
 
+            // 新增/删除列时添加 alpha 渐变
+            const isDeleting = col.targetWidth === 0 && col.sourceWidth > 0;
+            const isInserting = col.sourceWidth === 0 && col.targetWidth > 0;
+            const opacity = isDeleting ? 1 - progress : isInserting ? progress : 1;
+
             return (
-                <div key={i} className="ticker-column" style={{ width: `${width * baseW * charWidth}em` }}>
+                <div key={i} className="ticker-column" style={{
+                    width: `${width * baseW * charWidth}em`,
+                    opacity
+                }}>
                     {chars}
                 </div>
             );
         });
     }, [columns, progress, charWidth]);
 
-    return <div className={`ticker ${className}`.trim()}>{rendered}</div>;
+    return (
+        <div className={`ticker ${className}`.trim()}>
+            {prefix && <span className="ticker-prefix">{prefix}</span>}
+            {rendered}
+            {suffix && <span className="ticker-suffix">{suffix}</span>}
+        </div>
+    );
 };
 
 export default React.memo(Ticker);

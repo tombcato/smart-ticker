@@ -19,4 +19,5 @@ export {
 export type {
     ScrollingDirection,
     ColumnState,
+    EasingName,
 } from './core/TickerCore';

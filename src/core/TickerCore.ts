@@ -231,7 +231,9 @@ export function applyProgress(col: ColumnState, progress: number, forceUpdate = 
 // ============================================================================
 // Easing Functions
 // ============================================================================
-export const easingFunctions: Record<string, (t: number) => number> = {
+export type EasingName = 'linear' | 'easeIn' | 'easeOut' | 'easeInOut' | 'bounce';
+
+export const easingFunctions: Record<EasingName, (t: number) => number> = {
     linear: (t) => t,
     easeIn: (t) => t * t,
     easeOut: (t) => 1 - (1 - t) * (1 - t),

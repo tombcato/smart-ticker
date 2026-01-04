@@ -143,11 +143,16 @@ const price = ref('73.18');
 |------|------|--------|------|
 | `value` | `string` | - | 要显示的文本值（必填） |
 | `duration` | `number` | `500` | 动画持续时间（毫秒） |
-| `easing` | `string` | `'easeInOut'` | 缓动函数：`linear`、`easeIn`、`easeOut`、`easeInOut`、`bounce` |
+| `easing` | `EasingName \| function` | `'easeInOut'` | 缓动函数：`linear`、`easeIn`、`easeOut`、`easeInOut`、`bounce`，或自定义 `(t: number) => number` |
 | `direction` | `string` | `'ANY'` | 滚动方向：`UP`、`DOWN`、`ANY`（自动选择最短路径） |
 | `charWidth` | `number` | `1` | 字符宽度倍率（基准为 0.8em） |
 | `characterLists` | `string[]` | `['0123456789']` | 支持的字符列表 |
 | `className` | `string` | `''` | 自定义 CSS 类名 |
+| `animateOnMount` | `boolean` | `false` | 首次加载时是否播放动画 |
+| `disabled` | `boolean` | `false` | 禁用动画，直接显示最终值 |
+| `prefix` | `string` | - | 静态前缀（不参与滚动动画） |
+| `suffix` | `string` | - | 静态后缀（不参与滚动动画） |
+| `onAnimationEnd` | `() => void` | - | 动画结束回调（Vue: `@animation-end`） |
 
 ### 内置字符列表
 
@@ -238,6 +243,10 @@ smart-ticker/
 - **语言**: TypeScript
 - **框架**: React 18 / Vue 3
 - **样式**: CSS Variables + 响应式设计
+
+## 📝 更新日志
+
+查看 [CHANGELOG.md](./CHANGELOG.md) 了解版本更新详情。
 
 ## 📄 License
 MIT
