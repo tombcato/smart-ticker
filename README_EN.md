@@ -11,11 +11,11 @@
   <a href="./README.md">简体中文</a> | <strong>English</strong>
 </p>
 <p align="center">
-  Supports any characters
+  Supports any characters<br />
   <img src="./smartticker2.gif" alt="Demo" width="600" />
 </p>
 <p align="center">
-  Supports Prefix/Suffix, Intl Formatting, Auto-Scale, Fading Edges
+  Supports Prefix/Suffix, Intl Formatting, Auto-Scale, Fading Edges<br />
   <img src="./smartticker3.gif" alt="Demo" width="600" />
 </p>
 <p align="center">
