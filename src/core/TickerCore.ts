@@ -3,12 +3,40 @@
 // ============================================================================
 export const EMPTY_CHAR = '\0';
 
-export const TickerUtils = {
-    provideNumberList: () => '0123456789',
-    provideAlphabeticalList: () => 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
+export const Presets = {
+    NUMBER: '0123456789',
+    ALPHABET: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
+    ALPHANUMERIC: '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
+    // 常用货币字符：数字 + 标点 货币符号不穿滚动不加
+    CURRENCY: '0123456789.,',
 };
 
 export type ScrollingDirection = 'ANY' | 'UP' | 'DOWN';
+
+// ============================================================================
+// Defaults & Helpers
+// ============================================================================
+export const TickerConstants = {
+    CHAR_HEIGHT: 1.2, // em
+    DEFAULT_DURATION: 500, // ms
+    DEFAULT_MIN_SCALE: 0.1,
+    FW_RATIO: 1.25, // 中文字符宽度1.25em
+    HW_RATIO: 0.75, // 英文字符宽度0.75em
+};
+
+// Check if character is full-width (CJK, Emoji, etc.)
+export const isFW = (c: string): boolean => {
+    if (!c || c.length === 0) return false;
+    const code = c.codePointAt(0) || 0;
+    return (
+        (code >= 0x3000 && code <= 0x9FFF) ||  // CJK 标点 + 汉字
+        (code >= 0xAC00 && code <= 0xD7AF) ||  // 韩文
+        (code >= 0xFF00 && code <= 0xFFEF) ||  // 全角 ASCII
+        (code >= 0x1F300 && code <= 0x1FAFF)   // Emoji 范围
+    );
+};
+
+export const getW = (c: string): number => isFW(c) ? TickerConstants.FW_RATIO : TickerConstants.HW_RATIO;
 
 // ============================================================================
 // TickerCharacterList
@@ -231,7 +259,7 @@ export function applyProgress(col: ColumnState, progress: number, forceUpdate = 
 // ============================================================================
 // Easing Functions
 // ============================================================================
-export type EasingName = 'linear' | 'easeIn' | 'easeOut' | 'easeInOut' | 'bounce';
+export type EasingName = 'linear' | 'easeIn' | 'easeOut' | 'easeInOut' | 'bounce' | 'easeOutCubic' | 'easeOutExpo' | 'backOut';
 
 export const easingFunctions: Record<EasingName, (t: number) => number> = {
     linear: (t) => t,
@@ -250,5 +278,12 @@ export const easingFunctions: Record<EasingName, (t: number) => number> = {
         } else {
             return n1 * (t -= 2.625 / d1) * t + 0.984375;
         }
+    },
+    easeOutCubic: (t) => 1 - Math.pow(1 - t, 3),
+    easeOutExpo: (t) => t === 1 ? 1 : 1 - Math.pow(2, -10 * t),
+    backOut: (t) => {
+        const c1 = 1.70158;
+        const c3 = c1 + 1;
+        return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
     },
 };

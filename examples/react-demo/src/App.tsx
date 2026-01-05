@@ -1,28 +1,62 @@
 import { useState, useEffect } from 'react'
-import { Ticker, TickerUtils } from '@tombcato/smart-ticker'
+import { Ticker, Presets } from '../../../src/index'
 import '@tombcato/smart-ticker/style.css'
+import './index.css'
 
-type EasingType = 'linear' | 'easeInOut' | 'bounce'
-type DemoMode = 'price' | 'text'
+
+type DemoMode = 'price' | 'text' | 'intl-currency'
 
 function App() {
     const [mode, setMode] = useState<DemoMode>('price')
     const [value, setValue] = useState<string | number>(173.50)
     const [charWidth, setCharWidth] = useState(1)
     const [duration, setDuration] = useState(800)
-    const [easing, setEasing] = useState<EasingType>('easeInOut')
+    const [easing, setEasing] = useState<import('../../../src/core/TickerCore').EasingName>('easeOutCubic')
+    const [fadingEdge, setFadingEdge] = useState(true)
+
+    const [activeFormatter, setActiveFormatter] = useState<Intl.NumberFormat | undefined>()
+    const [activeIntlParams, setActiveIntlParams] = useState<{ locale: string, options: Intl.NumberFormatOptions }>({ locale: 'en-US', options: { style: 'currency', currency: 'USD' } })
+
+    const [direction, setDirection] = useState<'ANY' | 'UP' | 'DOWN'>('ANY')
+    const [prefix, setPrefix] = useState('')
+    const [suffix, setSuffix] = useState('')
+    const [disableAnimation, setDisableAnimation] = useState(false)
+    const [autoScale, setAutoScale] = useState(false)
+    const [copied, setCopied] = useState(false)
 
     useEffect(() => {
         let timer: number
 
         if (mode === 'price') {
-            const prices = [73.18, 76.58, 173.50, 9.10]
+            const prices = [973.18, 976.58, 1073.50, 97.10]
             let idx = 0
             setValue(prices[0])
-            timer = setInterval(() => {
+            timer = window.setInterval(() => {
                 idx = (idx + 1) % prices.length
                 setValue(prices[idx])
             }, 2000)
+        } else if (mode === 'intl-currency') {
+            // 测试 Intl 格式化：轮播不同的货币、百分比、单位等
+            const intlConfig: { val: number, locale: string, options: Intl.NumberFormatOptions }[] = [
+                { val: 1345.56, locale: 'en-US', options: { style: 'currency', currency: 'USD' } },
+                { val: 0.455, locale: 'zh-CN', options: { style: 'percent', minimumFractionDigits: 1 } },
+                { val: 92458, locale: 'en-US', options: { style: 'unit', unit: 'meter-per-second' } },
+                { val: 4544654321, locale: 'zh-CN', options: { notation: 'compact', compactDisplay: 'long' } },
+                { val: 23456.78, locale: 'de-DE', options: { style: 'currency', currency: 'EUR' } },
+            ]
+            let idx = 0
+            const update = (i: number) => {
+                const conf = intlConfig[i]
+                setValue(conf.val)
+                setActiveFormatter(new Intl.NumberFormat(conf.locale, conf.options))
+                setActiveIntlParams({ locale: conf.locale, options: conf.options })
+            }
+            update(0)
+
+            timer = window.setInterval(() => {
+                idx = (idx + 1) % intlConfig.length
+                update(idx)
+            }, 3000)
         } else {
             const words = [
                 'Smart Ticker',
@@ -33,7 +67,7 @@ function App() {
             ]
             let idx = 0
             setValue(words[0])
-            timer = setInterval(() => {
+            timer = window.setInterval(() => {
                 idx = (idx + 1) % words.length
                 setValue(words[idx])
             }, 2000)
@@ -43,17 +77,22 @@ function App() {
     }, [mode])
 
     // Determine character lists based on mode
-    const currentCharacterLists = mode === 'price'
-        ? ['0123456789.,']
-        : [
-            TickerUtils.provideAlphabeticalList(),
-            TickerUtils.provideAlphabeticalList().toUpperCase(),
-            TickerUtils.provideNumberList(),
+    const currentCharacterLists = mode === 'text'
+        ? [
+            Presets.ALPHABET,
+            Presets.ALPHABET.toUpperCase(),
+            Presets.NUMBER,
             ' .%v-@#$'
         ]
+        // 增加各种货币符号
+        : (mode === 'intl-currency' ? [Presets.CURRENCY] : [Presets.NUMBER])
 
     // Determine display value
-    const displayValue = mode === 'price' ? Number(value).toFixed(2) : String(value)
+    // 如果是 intl-currency 模式，直接传 number 给组件让它格式化
+    // 其他模式手动转 string
+    const displayValueForProps = mode === 'intl-currency' ? Number(value) : (mode === 'price' ? Number(value).toFixed(2) : String(value))
+
+    const numberFormatProp = mode === 'intl-currency' ? { numberFormat: activeFormatter } : {}
 
     return (
         <div className="app-container">
@@ -62,20 +101,26 @@ function App() {
                     <img src="/logo.svg" alt="logo" className="logo" />
                     <h1>Smart Ticker - React Demo</h1>
                 </div>
-                <p className="subtitle">通过 npm install @tombcato/smart-ticker 引入</p>
+
             </header>
 
-            <div className="ticker-display">
-                {mode === 'price' && <span className="currency-symbol">$</span>}
-                <div className="ticker-main">
-                    <Ticker
-                        value={displayValue}
-                        duration={duration}
-                        easing={easing}
-                        charWidth={charWidth}
-                        characterLists={currentCharacterLists}
-                    />
-                </div>
+            <div className="ticker-display" style={{ width: autoScale ? '100%' : undefined }}>
+
+                <Ticker
+                    value={displayValueForProps}
+                    duration={duration}
+                    easing={easing}
+                    charWidth={charWidth}
+                    characterLists={currentCharacterLists}
+                    direction={direction}
+                    prefix={prefix}
+                    suffix={suffix}
+                    disableAnimation={disableAnimation}
+                    autoScale={autoScale}
+
+                    fadingEdge={fadingEdge}
+                    {...numberFormatProp}
+                />
             </div>
 
             <div className="controls">
@@ -84,6 +129,7 @@ function App() {
                     <div className="label">演示模式</div>
                     <div className="options">
                         <button className={mode === 'price' ? 'active' : ''} onClick={() => setMode('price')}>数字</button>
+                        <button className={mode === 'intl-currency' ? 'active' : ''} onClick={() => setMode('intl-currency')}>Intl 格式化</button>
                         <button className={mode === 'text' ? 'active' : ''} onClick={() => setMode('text')}>文本</button>
                     </div>
                 </div>
@@ -123,35 +169,156 @@ function App() {
                 {/* 缓动曲线控制 */}
                 <div className="control-group">
                     <div className="label">缓动曲线</div>
-                    <div className="options">
+                    <div className="options" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
                         {[
                             { key: 'linear', label: '线性' },
                             { key: 'easeInOut', label: '先加后减' },
                             { key: 'bounce', label: '回弹' },
+                            { key: 'easeOutCubic', label: '柔和' },
+                            { key: 'easeOutExpo', label: '极速' },
+                            { key: 'backOut', label: '灵动' },
                         ].map((e) => (
                             <button
                                 key={e.key}
                                 className={easing === e.key ? 'active' : ''}
-                                onClick={() => setEasing(e.key as EasingType)}
+                                onClick={() => setEasing(e.key as any)}
                             >
                                 {e.label}
                             </button>
                         ))}
                     </div>
                 </div>
+
+                {/* 滚动方向控制 */}
+                <div className="control-group">
+                    <div className="label">滚动方向</div>
+                    <div className="options">
+                        {(['ANY', 'UP', 'DOWN'] as const).map((d) => (
+                            <button
+                                key={d}
+                                className={direction === d ? 'active' : ''}
+                                onClick={() => setDirection(d)}
+                            >
+                                {d}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                {/* 前缀后缀与动画开关 */}
+                <div className="control-group">
+                    <div className="label">装饰与控制</div>
+                    <div className="options" style={{ flexDirection: 'column', gap: '8px', alignItems: 'stretch' }}>
+                        <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+                            <div style={{ position: 'relative' }}>
+                                <span style={{ position: 'absolute', left: '8px', top: '50%', transform: 'translateY(-50%)', fontSize: '12px', color: '#a0a3bd', pointerEvents: 'none' }}>前</span>
+                                <input
+                                    type="text"
+                                    value={prefix}
+                                    onChange={(e) => setPrefix(e.target.value)}
+                                    style={{
+                                        padding: '6px 8px 6px 24px',
+                                        borderRadius: '6px',
+                                        border: '1px solid #e0e0e0',
+                                        width: '80px',
+                                        textAlign: 'center',
+                                        fontSize: '14px',
+                                        outline: 'none',
+                                        color: '#1a1d2d'
+                                    }}
+                                />
+                            </div>
+                            <div style={{ position: 'relative' }}>
+                                <span style={{ position: 'absolute', left: '8px', top: '50%', transform: 'translateY(-50%)', fontSize: '12px', color: '#a0a3bd', pointerEvents: 'none' }}>后</span>
+                                <input
+                                    type="text"
+                                    value={suffix}
+                                    onChange={(e) => setSuffix(e.target.value)}
+                                    style={{
+                                        padding: '6px 8px 6px 24px',
+                                        borderRadius: '6px',
+                                        border: '1px solid #e0e0e0',
+                                        width: '80px',
+                                        textAlign: 'center',
+                                        fontSize: '14px',
+                                        outline: 'none',
+                                        color: '#1a1d2d'
+                                    }}
+                                />
+                            </div>
+                        </div>
+                        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'center', marginTop: '4px' }}>
+                            <button
+                                className={autoScale ? 'active' : ''}
+                                onClick={() => setAutoScale(!autoScale)}
+                                style={{ fontSize: '13px', padding: '4px 10px', border: '1px solid #e0e0e0' }}
+                            >
+                                自动缩放
+                            </button>
+                            <button
+                                className={fadingEdge ? 'active' : ''}
+                                onClick={() => setFadingEdge(!fadingEdge)}
+                                style={{ fontSize: '13px', padding: '4px 10px', border: '1px solid #e0e0e0' }}
+                            >
+                                边缘模糊
+                            </button>
+                            <button
+                                className={disableAnimation ? 'active' : ''}
+                                onClick={() => setDisableAnimation(!disableAnimation)}
+                                style={{ fontSize: '13px', padding: '4px 10px', border: '1px solid #e0e0e0' }}
+                            >
+                                禁用动画
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <footer className="code-section">
-                <h2>💻 使用代码</h2>
-                <pre><code>{`import { Ticker, TickerUtils } from '@tombcato/smart-ticker'
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                    <h2 style={{ margin: 0 }}>💻 使用代码</h2>
+                    <button
+                        onClick={() => {
+                            const code = document.querySelector('.code-section code')?.textContent || ''
+                            navigator.clipboard.writeText(code)
+                            setCopied(true)
+                            setTimeout(() => setCopied(false), 2000)
+                        }}
+                        style={{
+                            padding: '6px 12px',
+                            borderRadius: '6px',
+                            border: '1px solid #e0e0e0',
+                            background: copied ? '#4a6bff' : '#fff',
+                            color: copied ? '#fff' : '#666',
+                            cursor: 'pointer',
+                            fontSize: '14px',
+                            transition: 'all 0.2s'
+                        }}
+                    >
+                        {copied ? '✓ 已复制' : '📋 复制'}
+                    </button>
+                </div>
+                <pre><code>{`import { Ticker, Presets } from '@tombcato/smart-ticker'
 import '@tombcato/smart-ticker/style.css'
-
+${mode === 'intl-currency' ? `
+// Intl.NumberFormat 实例
+const formatter = new Intl.NumberFormat(
+    '${activeIntlParams.locale}', 
+    ${JSON.stringify(activeIntlParams.options).replace(/"/g, "'")})
+` : ''}
 <Ticker
-  value="${displayValue}"
+  value={${typeof displayValueForProps === 'number' ? displayValueForProps : `"${displayValueForProps}"`}}
   duration={${duration}}
   easing="${easing}"
   charWidth={${charWidth}}
-  characterLists={${mode === 'price' ? "['0123456789.,']" : "[TickerUtils.provideAlphabeticalList()]"}}
+  direction="${direction}"${prefix ? `
+  prefix="${prefix}"` : ''}${suffix ? `
+  suffix="${suffix}"` : ''}${disableAnimation ? `
+  disableAnimation` : ''}
+  characterLists={${mode === 'text' ? '[Presets.ALPHABET, Presets.NUMBER, " .%@#$"]' : (mode === 'intl-currency' ? 'Presets.CURRENCY' : 'Presets.NUMBER')}}${mode === 'intl-currency' ? `
+  numberFormat={formatter}` : ''}${autoScale ? `
+  autoScale` : ''}${fadingEdge ? `
+  fadingEdge` : ''}
 />`}</code></pre>
             </footer>
         </div>

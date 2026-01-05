@@ -13,6 +13,7 @@
   position: relative;
   /* 确保字符边缘不会露出 */
   clip-path: inset(0);
+  will-change: transform, width, opacity;
 }
 
 .ticker-char {
@@ -25,4 +26,29 @@
   align-items: center;
   justify-content: center;
   white-space: pre;
+}
+
+.ticker-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.ticker-prefix,
+.ticker-suffix {
+  white-space: pre;
+  height: 1.2em;
+  line-height: 1.2em;
+  display: inline-block;
+}
+
+.ticker-fading-edge {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%);
 }

@@ -29,8 +29,8 @@
 | | |
 | :--- | :--- |
 | **🌏 Multi-Charset Support**<br>Supports CJK, Numbers, Emojis, and mixed text rolling. Auto-adjusts spacing based on Unicode width. | **🧠 Smart Diff Animation**<br>Uses Levenshtein algorithm to find the shortest change path; identical characters remain static. |
-| **⚡ Smooth Interruption**<br>Seamlessly transitions to new targets if the value changes dynamically during animation. | **📈 Rich Motion**<br>Built-in `linear`, `bounce`, `easeInOut` easings. Supports `charWidth` for fine-tuning. |
-| **🦄 Dual Framework**<br>Provides both React (Hooks) and Vue 3 (Composition) components with a unified API. | **🚀 High Performance**<br>Powered by `RAF`, removing DOM overhead, optimized for high-frequency data streams. |
+| **⚡ Smooth Interruption**<br>Seamlessly transitions to new targets if the value changes dynamically during animation. | **📈 Rich Motion**<br>Built-in variety of easings.Supports custom easing function. Supports `charWidth` fine-tuning. |
+| **🦄 Dual Framework**<br>Provides both React (Hooks) and Vue 3 (Composition) components with a unified API. | **🚀 High Performance**<br>Powered by `RAF`, supporting **Auto-scale**, **Fading Edge**, and **Disable Animation**. |
 
 ## 📦 Installation
 
@@ -138,7 +138,7 @@ The component uses the system monospace stack by default. To use a custom font (
 
 | Prop | Type | Default | Description |
 |------|------|--------|------|
-| `value` | `string` | - | The text value to display (Required) |
+| `value` | `string`\|`number` | - | The text value to display (Required) |
 | `duration` | `number` | `500` | Animation duration (ms) |
 | `easing` | `EasingName \| function` | `'easeInOut'` | Easing: `linear`, `easeIn`, `easeOut`, `easeInOut`, `bounce`, or custom `(t: number) => number` |
 | `direction` | `string` | `'ANY'` | Scroll direction: `UP`, `DOWN`, `ANY` (shortest path) |
@@ -146,42 +146,51 @@ The component uses the system monospace stack by default. To use a custom font (
 | `characterLists` | `string[]` | `['0123456789']` | Allowed character sets |
 | `className` | `string` | `''` | Custom CSS class name |
 | `animateOnMount` | `boolean` | `false` | Animate on initial render |
-| `disabled` | `boolean` | `false` | Disable animation, show final value immediately |
+| `disableAnimation` | `boolean` | `false` | Disable animation, show final value immediately |
+| `autoScale` | `boolean` | `false` | Enable auto-scaling to fit container width |
+| `fadingEdge` | `boolean` | `false` | Enable top/bottom fading edge effect |
 | `prefix` | `string` | - | Static prefix (not animated) |
 | `suffix` | `string` | - | Static suffix (not animated) |
+| `numberFormat` | `Intl.NumberFormat` | - | Intl formatter number `value` |
 | `onAnimationEnd` | `() => void` | - | Callback when animation ends (Vue: `@animation-end`) |
 
-### Built-in Character Lists
 
-```ts
-import { TickerUtils } from './components/Ticker';
-
-TickerUtils.provideNumberList()        // '0123456789'
-TickerUtils.provideAlphabeticalList()  // 'abc...zABC...Z'
-
-### 🧩 Character Configuration
+### 🧩 Character Configuration (characterLists)
 
 `characterLists` controls the core animation logic. It accepts an array of strings, where each string represents a group of characters that can **scroll into each other**.
 
-**Rules:**
-1.  **Scroll**: If both the old and new characters belong to the same group string (e.g., `0` to `9` in `'0123456789'`), they will scroll.
-2.  **Switch**: If they are in different groups, or if a character is not in any list (e.g., Chinese characters), they will switch instantly without scrolling.
+#### Presets (Common Character Lists)
+For convenience, we provide built-in constants for common character sets:
 
-**Configuration Tips:**
+```ts
+import { Presets } from '@tombcato/smart-ticker';
 
-*   `TickerUtils.provideAlphabeticalList()` includes both `a-z` and `A-Z`.
-*   To prevent scrolling between cases (e.g., `a` -> `A`), provide them as separate strings: `['abc...', 'ABC...']`.
-
-**Example:**
-
-```javascript
-characterLists={[
-  'abcdefghijklmnopqrstuvwxyz', // Lowercase group
-  'ABCDEFGHIJKLMNOPQRSTUVWXYZ', // Uppercase group
-  '0123456789',                 // Number group
-  '.,!@#$%^&*'                  // Symbol group
-]}
+Presets.NUMBER        // '0123456789'
+Presets.ALPHABET      // 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+Presets.ALPHANUMERIC  // '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+Presets.CURRENCY      // '0123456789.,'
 ```
+
+#### Animation Rules
+1.  **Scroll**: If both the old and new characters belong to the same group string (e.g., `0` to `9` in `Presets.NUMBER`), they will scroll.
+2.  **Switch**: If they are in different groups, or if a character is not in any list (e.g., Chinese characters), they will switch instantly (fade/flip) without scrolling.
+
+#### Configuration Tips
+*   **Common Use Case**: Simply use `Presets.ALPHANUMERIC` to support most alphanumeric scrolling.
+*   **Case Isolation**: To prevent scrolling between cases (e.g., `a` -> `A`), list them as separate groups: `[Presets.NUMBER, 'abc...', 'ABC...']`.
+
+**Code Example:**
+
+```tsx
+<Ticker
+  value={val}
+  characterLists={[
+    Presets.NUMBER,                 // Numbers
+    'abcdefghijklmnopqrstuvwxyz', // Lowercase Group
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZ', // Uppercase Group
+    '.,!@#$%^&*'                  // Symbols
+  ]}
+/>
 ```
 
 ## 💻 Running Demos

@@ -4,7 +4,7 @@ export { default as Ticker } from './components/vue/Ticker.vue';
 // Core utilities (framework-agnostic)
 export {
     TickerCharacterList,
-    TickerUtils,
+    Presets,
     easingFunctions,
     computeColumnActions,
     createColumn,

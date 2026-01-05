@@ -1,5 +1,5 @@
 // React Entry Point
-export { Ticker, TickerUtils } from './components/Ticker';
+export { Ticker, Presets } from './components/Ticker';
 export type { TickerProps } from './components/Ticker';
 
 // Core utilities (framework-agnostic)
