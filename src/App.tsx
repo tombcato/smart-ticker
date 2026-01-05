@@ -66,7 +66,10 @@ function App() {
     const [btcTrend, setBtcTrend] = useState<'up' | 'down'>('up');
     const [isBalanceHidden, setIsBalanceHidden] = useState(false);
 
-    const [lang, setLang] = useState<'zh' | 'en'>('zh');
+    const [lang, setLang] = useState<'zh' | 'en'>(() => {
+        const queryLang = new URLSearchParams(window.location.search).get('lang');
+        return queryLang === 'en' ? 'en' : 'zh';
+    });
     const [theme, setTheme] = useState<'dark' | 'light'>('light');
 
     // 主题切换
@@ -418,7 +421,13 @@ function App() {
 
                     <button
                         className="icon-btn"
-                        onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')}
+                        onClick={() => {
+                            const newLang = lang === 'zh' ? 'en' : 'zh';
+                            setLang(newLang);
+                            const url = new URL(window.location.href);
+                            url.searchParams.set('lang', newLang);
+                            window.history.pushState({}, '', url);
+                        }}
                         title={lang === 'zh' ? 'Switch to English' : '切换中文'}
                     >
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
