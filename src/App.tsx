@@ -849,43 +849,157 @@ function App() {
                                             const numberFormatProp = heroMode === 'intl-currency' ? '\n  numberFormat={formatter}' : '';
 
                                             const appCode = codeFramework === 'react'
-                                                ? `import { Ticker, Presets } from '@tombcato/smart-ticker'
+                                                ? `import { useState } from 'react'
+import { Ticker, Presets } from '@tombcato/smart-ticker'
 import '@tombcato/smart-ticker/style.css'
 ${formatterCode}
 export default function App() {
+  const [value, setValue] = useState(${heroMode === 'text' ? `"${heroValue}"` : heroValue})
+
   return (
-    <div style={{ padding: '2rem', fontFamily: 'system-ui' }}>
-      <h1>Smart Ticker Demo</h1>
-      <Ticker
-        value={${heroMode === 'text' ? `"${heroValue}"` : heroValue}}
-        duration={${animDuration}}
-        easing="${easing}"
-        charWidth={${charWidth}}
-        direction="${direction}"
-        characterLists={[${preset}]}${prefix ? `\n        prefix="${prefix}"` : ''}${suffix ? `\n        suffix="${suffix}"` : ''}${autoScale ? '\n        autoScale' : ''}${fadingEdge ? '\n        fadingEdge' : ''}${disableAnimation ? '\n        disableAnimation' : ''}${numberFormatProp}
-      />
+    <div style={{ 
+      minHeight: '100vh', 
+      display: 'flex', 
+      flexDirection: 'column', 
+      alignItems: 'center', 
+      justifyContent: 'center', 
+      background: '#0a0a0a', 
+      color: '#fff',
+      fontFamily: 'Inter, system-ui, sans-serif'
+    }}>
+      <h1 style={{ marginBottom: '2rem', fontSize: '2rem', fontWeight: 600 }}>Smart Ticker Demo</h1>
+      
+      <div style={{ 
+        padding: '3rem', 
+        background: '#1a1a1a', 
+        borderRadius: '24px', 
+        boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+        border: '1px solid #333',
+        marginBottom: '2rem',
+        minWidth: '300px',
+        display: 'flex',
+        justifyContent: 'center',
+        fontSize: '3rem',
+        fontWeight: 'bold'
+      }}>
+        <Ticker
+          value={value}
+          duration={${animDuration}}
+          easing="${easing}"
+          charWidth={${charWidth}}
+          direction="${direction}"
+          characterLists={[${preset}]}${prefix ? `\n          prefix="${prefix}"` : ''}${suffix ? `\n          suffix="${suffix}"` : ''}${autoScale ? '\n          autoScale' : ''}${fadingEdge ? '\n          fadingEdge' : ''}${disableAnimation ? '\n          disableAnimation' : ''}${numberFormatProp}
+        />
+      </div>
+
+      <button 
+        onClick={() => setValue(${heroMode === 'text' ? 'Math.random().toString(36).substring(7)' : 'Math.random() * 10000'})}
+        style={{
+          padding: '12px 28px',
+          borderRadius: '99px',
+          border: 'none',
+          background: '#FFFFFF',
+          color: '#000',
+          fontWeight: 600,
+          cursor: 'pointer',
+          transition: 'transform 0.2s',
+          fontSize: '1rem'
+        }}
+        onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.05)'}
+        onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+      >
+        Randomize Value
+      </button>
     </div>
   )
 }`
                                                 : `<script setup>
+import { ref } from 'vue'
 import { Ticker, Presets } from '@tombcato/smart-ticker/vue'
 import '@tombcato/smart-ticker/style.css'
 ${formatterCode}
+
+const value = ref(${heroMode === 'text' ? `'${heroValue}'` : heroValue})
+
+const randomize = () => {
+  value.value = ${heroMode === 'text' ? "Math.random().toString(36).substring(7)" : "Math.random() * 10000"}
+}
 </script>
 
 <template>
-  <div style="padding: 2rem; font-family: system-ui">
+  <div class="container">
     <h1>Smart Ticker Demo</h1>
-    <Ticker
-      :value="${heroMode === 'text' ? heroValue : heroValue}"
-      :duration="${animDuration}"
-      :easing="'${easing}'"
-      :charWidth="${charWidth}"
-      :direction="'${direction}'"
-      :characterLists="[${preset}]"${prefix ? `\n      :prefix="'${prefix}'"` : ''}${suffix ? `\n      :suffix="'${suffix}'"` : ''}${autoScale ? '\n      autoScale' : ''}${fadingEdge ? '\n      fadingEdge' : ''}${disableAnimation ? '\n      disableAnimation' : ''}${heroMode === 'intl-currency' ? '\n      :numberFormat="formatter"' : ''}
-    />
+    
+    <div class="card">
+      <Ticker
+        :value="value"
+        :duration="${animDuration}"
+        :easing="'${easing}'"
+        :charWidth="${charWidth}"
+        :direction="'${direction}'"
+        :characterLists="[${preset}]"${prefix ? `\n        :prefix="'${prefix}'"` : ''}${suffix ? `\n        :suffix="'${suffix}'"` : ''}${autoScale ? '\n        autoScale' : ''}${fadingEdge ? '\n        fadingEdge' : ''}${disableAnimation ? '\n        disableAnimation' : ''}${heroMode === 'intl-currency' ? '\n        :numberFormat="formatter"' : ''}
+      />
+    </div>
+
+    <button @click="randomize">Randomize Value</button>
   </div>
-</template>`;
+</template>
+
+<style>
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+
+body {
+  margin: 0;
+  background-color: #0a0a0a;
+  color: #ffffff;
+}
+
+.container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+h1 {
+  margin-bottom: 2rem;
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+.card {
+  padding: 3rem;
+  background: #1a1a1a;
+  border-radius: 24px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  border: 1px solid #333;
+  margin-bottom: 2rem;
+  min-width: 300px;
+  display: flex;
+  justify-content: center;
+  font-size: 3rem;
+  font-weight: bold;
+}
+
+button {
+  padding: 12px 28px;
+  border-radius: 99px;
+  border: none;
+  background: #FFFFFF;
+  color: #000;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s;
+  font-size: 1rem;
+}
+
+button:hover {
+  transform: scale(1.05);
+}
+</style>`;
 
                                             const files = codeFramework === 'react'
                                                 ? {
@@ -898,12 +1012,49 @@ createRoot(document.getElementById('root')!).render(<App />)`,
                                                     'package.json': JSON.stringify({
                                                         name: 'smart-ticker-demo',
                                                         private: true,
+                                                        scripts: {
+                                                            "dev": "vite",
+                                                            "build": "vite build",
+                                                            "preview": "vite preview"
+                                                        },
                                                         dependencies: {
                                                             '@tombcato/smart-ticker': 'latest',
                                                             'react': '^18',
                                                             'react-dom': '^18'
+                                                        },
+                                                        devDependencies: {
+                                                            "@types/react": "^18.2.0",
+                                                            "@types/react-dom": "^18.2.0",
+                                                            "@vitejs/plugin-react": "^4.2.0",
+                                                            "typescript": "^5.2.0",
+                                                            "vite": "^5.0.0"
                                                         }
-                                                    }, null, 2)
+                                                    }, null, 2),
+                                                    'tsconfig.json': JSON.stringify({
+                                                        "compilerOptions": {
+                                                            "target": "ES2020",
+                                                            "useDefineForClassFields": true,
+                                                            "lib": ["ES2020", "DOM", "DOM.Iterable"],
+                                                            "module": "ESNext",
+                                                            "skipLibCheck": true,
+                                                            "moduleResolution": "bundler",
+                                                            "allowImportingTsExtensions": true,
+                                                            "resolveJsonModule": true,
+                                                            "isolatedModules": true,
+                                                            "noEmit": true,
+                                                            "jsx": "react-jsx",
+                                                            "strict": true,
+                                                            "noUnusedLocals": true,
+                                                            "noUnusedParameters": true,
+                                                            "noFallthroughCasesInSwitch": true
+                                                        },
+                                                        "include": ["src"]
+                                                    }, null, 2),
+                                                    'vite.config.ts': `import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+export default defineConfig({
+  plugins: [react()],
+})`
                                                 }
                                                 : {
                                                     'src/App.vue': appCode,
@@ -915,11 +1066,27 @@ createApp(App).mount('#app')`,
                                                     'package.json': JSON.stringify({
                                                         name: 'smart-ticker-vue-demo',
                                                         private: true,
+                                                        scripts: {
+                                                            "dev": "vite",
+                                                            "build": "vite build",
+                                                            "preview": "vite preview"
+                                                        },
                                                         dependencies: {
                                                             '@tombcato/smart-ticker': 'latest',
                                                             'vue': '^3'
+                                                        },
+                                                        devDependencies: {
+                                                            "@vitejs/plugin-vue": "^5.0.0",
+                                                            "typescript": "^5.2.0",
+                                                            "vite": "^5.0.0",
+                                                            "vue-tsc": "^1.8.0"
                                                         }
-                                                    }, null, 2)
+                                                    }, null, 2),
+                                                    'vite.config.ts': `import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+export default defineConfig({
+  plugins: [vue()],
+})`
                                                 };
 
                                             // Use StackBlitz SDK

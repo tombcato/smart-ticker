@@ -12,13 +12,18 @@
 <p align="center">
   <strong>简体中文</strong> | <a href="./README_EN.md">English</a>
 </p>
-
+<p align="center">
+  支持任意字符文本
+  <img src="./smartticker2.gif" alt="Demo" width="600" />
+</p>
+<p align="center">
+支持前后缀，Intl格式化，自动缩放，边缘模糊
+  <img src="./smartticker3.gif" alt="Demo" width="600" />
+</p>
 <p align="center">
   <img src="./smartticker.gif" alt="Demo" width="600" />
 </p>
-<p align="center">
-  <img src="./smartticker2.gif" alt="Demo" width="600" />
-</p>
+
 
 <p align="center">
   <img src="https://img.shields.io/badge/React-18+-61DAFB?logo=react" alt="React" />

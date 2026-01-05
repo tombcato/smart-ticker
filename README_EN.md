@@ -10,13 +10,18 @@
 <p align="center">
   <a href="./README.md">简体中文</a> | <strong>English</strong>
 </p>
-
+<p align="center">
+  Supports any characters
+  <img src="./smartticker2.gif" alt="Demo" width="600" />
+</p>
+<p align="center">
+  Supports Prefix/Suffix, Intl Formatting, Auto-Scale, Fading Edges
+  <img src="./smartticker3.gif" alt="Demo" width="600" />
+</p>
 <p align="center">
   <img src="./smartticker.gif" alt="Demo" width="600" />
 </p>
-<p align="center">
-  <img src="./smartticker2.gif" alt="Demo" width="600" />
-</p>
+
 
 <p align="center">
   <img src="https://img.shields.io/badge/React-18+-61DAFB?logo=react" alt="React" />
