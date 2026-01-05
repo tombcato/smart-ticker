@@ -16,9 +16,9 @@ const randomWithDigitChange = () => {
 
 function App() {
     // 状态定义
-    const [heroMode, setHeroMode] = useState<'price' | 'text' | 'intl-currency'>('price');
+    const [heroMode, setHeroMode] = useState<'price' | 'text' | 'intl-currency'>('text');
     const [heroPrice, setHeroPrice] = useState(1345.56);
-    const [heroText, setHeroText] = useState('Success');
+    const [heroText, setHeroText] = useState('Smart Ticker');
 
     // Intl State
     const [activeFormatter, setActiveFormatter] = useState<Intl.NumberFormat>(new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }));
