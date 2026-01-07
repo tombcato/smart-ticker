@@ -8,7 +8,7 @@
   High-performance smart text ticker component based on Levenshtein diff algorithm. Supports CJK, numbers, letters, emojis, and mixed charsets. <a href="https://tombcato.github.io/smart-ticker/">Live Demo ></a>
 
 <p align="center">
-  <a href="./README.md">简体中文</a> | <strong>English</strong>
+  <a href="./README.md">🇨🇳 简体中文</a> &nbsp;|&nbsp; <strong>🇬🇧 English</strong>
 </p>
 <p align="center">
   Supports any characters<br />

@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <strong>简体中文</strong> | <a href="./README_EN.md">English</a>
+  <strong>🇨🇳 简体中文</strong> &nbsp;|&nbsp; <a href="./README_EN.md">🇬🇧 English</a>
 </p>
 <p align="center">
   支持任意字符文本<br />
