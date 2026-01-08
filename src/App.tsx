@@ -55,8 +55,13 @@ function App() {
     ];
 
     const [digitDemo, setDigitDemo] = useState(999);
-    const [interruptTarget, setInterruptTarget] = useState(50);
-    const [mixedDemo, setMixedDemo] = useState('A1-Ticker🎉');
+    const [interruptTarget, setInterruptTarget] = useState<string | number>('Try 哈哈👻');
+    const [interruptInput, setInterruptInput] = useState('Try Replace');
+    const [slotReels, setSlotReels] = useState(['💰', '💰', '💰']);
+
+    // Slot items - replaced composite 7️⃣ with single-codepoint 💰 to avoid splitting issues
+    const SLOT_ITEMS = ['🍒', '🍋', '🍉', '🍇', '💎', '🔔', '💰', '🎰', '⭐'];
+    const SLOT_CHARS = SLOT_ITEMS.join('');
 
     const [installIndex, setInstallIndex] = useState(0);
     const [musicIndex, setMusicIndex] = useState(0);
@@ -148,7 +153,7 @@ function App() {
     const t = {
         zh: {
             title: 'Smart Ticker',
-            subtitle: '高性能智能文本差异滚动组件，支持React/Vue',
+            subtitle: '高性能智能文本差异动画组件，支持React/Vue',
             changelog: '更新日志',
             price: '数字',
             text: '文本',
@@ -170,16 +175,16 @@ function App() {
             features: {
                 digit: { title: '智能位变', badge: 'Diff 算法', desc: '自动计算最短变更路径，平滑处理位数增减', action: '随机数字' },
                 interrupt: {
-                    title: '中断衔接',
+                    title: '交互输入',
                     badge: '稳定',
                     desc: '动画进行中可随时更新目标值，过渡自然流畅',
-                    action: '快速连续点击测试'
+                    action: 'Update'
                 },
-                mixed: {
-                    title: '混合字符',
-                    badge: '多样式',
-                    desc: '支持任意字符混合滚动',
-                    action: '随机生成'
+                slots: {
+                    title: '老虎机',
+                    badge: '趣味',
+                    desc: '模拟真实滚轮效果，独立动画控制',
+                    action: 'SPIN'
                 }
             },
             scenes: {
@@ -240,7 +245,7 @@ function App() {
         },
         en: {
             title: 'Smart Ticker',
-            subtitle: 'High-performance smart text diff scroller for React/Vue',
+            subtitle: 'High-Performance Text Diff Motion Component for React/Vue',
             changelog: 'Changelog',
             price: 'Number',
             text: 'Text',
@@ -262,16 +267,16 @@ function App() {
             features: {
                 digit: { title: 'Smart Diff', badge: 'Algorithm', desc: 'Calculates minimal edit path for smooth digit transitions', action: 'Random' },
                 interrupt: {
-                    title: 'Interruptible',
+                    title: 'Interactive Input',
                     badge: 'STABLE',
                     desc: 'Update target value mid-animation with smooth interpolation',
-                    action: 'Rapid Click Test'
+                    action: 'Update'
                 },
-                mixed: {
-                    title: 'Mixed Chars',
-                    badge: 'Versatile',
-                    desc: 'Any character mixed scrolling',
-                    action: 'Randomize'
+                slots: {
+                    title: 'Slot Machine',
+                    badge: 'FUN',
+                    desc: 'Simulated reel effect with independent controls',
+                    action: 'SPIN'
                 }
             },
             scenes: {
@@ -346,24 +351,42 @@ function App() {
 
     // Handlers
     const randomDigit = () => setDigitDemo(randomWithDigitChange());
-    const randomInterrupt = () => setInterruptTarget(randomWithDigitChange());
+    // const randomInterrupt = () => setInterruptTarget(randomWithDigitChange());
 
-    const randomMixed = () => {
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-#$';
+    const generateSimilarString = (base: string) => {
+        // Expanded char set including emojis as requested
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()';
         const emojis = ['🍕', '🚀', '🌙', '🎉', '🐱', '🌵', '🔥', '💎', '🦄', '🤖', '🦖', '🍎'];
-        const chinese = '天地玄黄宇宙洪荒日月盈昃辰宿列张寒来暑往秋收冬藏龙师火帝鸟官人皇';
-        let res = '';
-        for (let i = 0; i < 7; i++) {
-            const r = Math.random();
-            if (r > 0.85) {
-                res += emojis[Math.floor(Math.random() * emojis.length)];
-            } else if (r > 0.70) {
-                res += chinese[Math.floor(Math.random() * chinese.length)];
-            } else {
-                res += chars[Math.floor(Math.random() * chars.length)];
+        const baseStr = String(base || 'START');
+        // Use spread syntax to handle surrogate pairs (emojis) correctly
+        return [...baseStr].map((c) => {
+            // Keep roughly 40% of chars same to show "smart diff"
+            if (Math.random() > 0.6 || c === ' ') return c;
+
+            // 20% chance for emoji, otherwise alphanumeric/symbol
+            if (Math.random() > 0.8) {
+                return emojis[Math.floor(Math.random() * emojis.length)];
             }
-        }
-        setMixedDemo(res);
+            return chars[Math.floor(Math.random() * chars.length)];
+        }).join('');
+    };
+
+    const handleRandomUpdate = () => {
+        // 1. Update display with current input
+        setInterruptTarget(interruptInput);
+
+        // 2. Generate next random value based on current input and fill input
+        const next = generateSimilarString(interruptInput);
+        setInterruptInput(next);
+    };
+
+    const spinSlots = () => {
+        const nextReels = [
+            SLOT_ITEMS[Math.floor(Math.random() * SLOT_ITEMS.length)],
+            SLOT_ITEMS[Math.floor(Math.random() * SLOT_ITEMS.length)],
+            SLOT_ITEMS[Math.floor(Math.random() * SLOT_ITEMS.length)]
+        ];
+        setSlotReels(nextReels);
     };
 
     // 录制模式检测
@@ -1292,7 +1315,7 @@ export default defineConfig({
                             <span className="feature-badge">{t.features.digit.badge}</span>
                         </div>
                         <div className="feature-ticker">
-                            <Ticker value={digitDemo.toString()} duration={500} easing={easing} />
+                            <Ticker value={digitDemo.toString()} duration={500} easing={easing} animateOnMount={true} />
                         </div>
                         <div className="preset-buttons">
                             <button onClick={() => setDigitDemo(1)}>1</button>
@@ -1316,31 +1339,131 @@ export default defineConfig({
                             <span className="feature-badge">{t.features.interrupt.badge}</span>
                         </div>
                         <div className="feature-ticker">
-                            <Ticker value={interruptTarget.toString()} duration={500} />
+                            {/* Make it wide enough for text */}
+                            <Ticker value={interruptTarget} duration={500} characterLists={[Presets.ALPHANUMERIC]} autoScale />
                         </div>
-                        <button className="action-btn" onClick={randomInterrupt}>
-                            {t.features.interrupt.action}
+
+                        <div style={{ marginBottom: '0.5rem', width: '100%' }}>
+                            <input
+                                type="text"
+                                value={interruptInput}
+                                onChange={(e) => setInterruptInput(e.target.value)}
+                                onFocus={(e) => e.target.select()}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                        setInterruptTarget(interruptInput);
+                                    }
+                                }}
+                                style={{
+                                    width: '100%',
+                                    height: '42px',
+                                    borderRadius: '6px',
+                                    border: '1px solid var(--border)',
+                                    background: 'rgba(255,255,255,0.05)',
+                                    color: 'var(--text)',
+                                    padding: '0 12px',
+                                    outline: 'none',
+                                    boxSizing: 'border-box',
+                                    textAlign: 'center'
+                                }}
+                            />
+                        </div>
+
+                        <button className="action-btn" onClick={handleRandomUpdate}>
+                            Update
                         </button>
+
                         <div className="feature-desc">
                             {t.features.interrupt.desc}
                         </div>
                     </div>
 
-                    {/* 混合字符 */}
+                    {/* 老虎机 */}
                     <div className="feature-card">
                         <div className="feature-header">
-                            <span className="feature-icon">🎲</span>
-                            <span className="feature-title">{t.features.mixed.title}</span>
-                            <span className="feature-badge">{t.features.mixed.badge}</span>
+                            <span className="feature-icon">🎰</span>
+                            <span className="feature-title">{t.features.slots.title}</span>
+                            <span className="feature-badge">{t.features.slots.badge}</span>
                         </div>
-                        <div className="feature-ticker">
-                            <Ticker value={mixedDemo} characterLists={[Presets.ALPHANUMERIC]} duration={500} />
+                        <div className="feature-ticker" style={{ gap: '12px', }}>
+                            <div style={{
+                                background: 'linear-gradient(to bottom, #d1d5db 0%, #ffffff 20%, #ffffff 80%, #d1d5db 100%)',
+                                padding: '0',
+                                borderRadius: '8px',
+                                lineHeight: '1.2',
+                                width: '80px',
+                                height: '80px',
+                                fontSize: '3rem',
+                                textAlign: 'center',
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                overflow: 'hidden',
+                                boxShadow: 'inset 0 10px 15px -3px rgba(0,0,0,0.1), inset 0 -10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -1px rgba(0,0,0,0.05)',
+                                border: '1px solid #9ca3af'
+                            }}>
+                                <Ticker
+                                    value={slotReels[0]}
+                                    duration={2000}
+                                    direction="DOWN"
+                                    easing="backOut"
+                                    characterLists={SLOT_CHARS}
+                                />
+                            </div>
+                            <div style={{
+                                background: 'linear-gradient(to bottom, #d1d5db 0%, #ffffff 20%, #ffffff 80%, #d1d5db 100%)',
+                                padding: '0',
+                                borderRadius: '8px',
+                                lineHeight: '1.2',
+                                width: '80px',
+                                height: '80px',
+                                fontSize: '3rem',
+                                textAlign: 'center',
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                overflow: 'hidden',
+                                boxShadow: 'inset 0 10px 15px -3px rgba(0,0,0,0.1), inset 0 -10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -1px rgba(0,0,0,0.05)',
+                                border: '1px solid #9ca3af'
+                            }}>
+                                <Ticker
+                                    value={slotReels[1]}
+                                    duration={2500}
+                                    direction="DOWN"
+                                    easing="backOut"
+                                    characterLists={SLOT_CHARS}
+                                />
+                            </div>
+                            <div style={{
+                                background: 'linear-gradient(to bottom, #d1d5db 0%, #ffffff 20%, #ffffff 80%, #d1d5db 100%)',
+                                padding: '0',
+                                borderRadius: '8px',
+                                lineHeight: '1.2',
+                                width: '80px',
+                                height: '80px',
+                                fontSize: '3rem',
+                                textAlign: 'center',
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                overflow: 'hidden',
+                                boxShadow: 'inset 0 10px 15px -3px rgba(0,0,0,0.1), inset 0 -10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -1px rgba(0,0,0,0.05)',
+                                border: '1px solid #9ca3af'
+                            }}>
+                                <Ticker
+                                    value={slotReels[2]}
+                                    duration={3000}
+                                    direction="DOWN"
+                                    easing="backOut"
+                                    characterLists={SLOT_CHARS}
+                                />
+                            </div>
                         </div>
-                        <button className="action-btn" onClick={randomMixed}>
-                            {t.features.mixed.action}
+                        <button className="action-btn" onClick={spinSlots} style={{ background: 'linear-gradient(135deg, #f59e0b, #ed5f00)', border: 'none', color: '#fff', fontWeight: 'bold', marginTop: 'auto' }}>
+                            {t.features.slots.action}
                         </button>
-                        <div className="feature-desc">
-                            {t.features.mixed.desc}
+                        <div className="feature-desc" style={{ marginTop: '0px', marginBottom: '4px' }}>
+                            {t.features.slots.desc}
                         </div>
                     </div>
                 </div>

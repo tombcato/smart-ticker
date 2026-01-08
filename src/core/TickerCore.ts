@@ -32,7 +32,9 @@ export const isFW = (c: string): boolean => {
         (code >= 0x3000 && code <= 0x9FFF) ||  // CJK 标点 + 汉字
         (code >= 0xAC00 && code <= 0xD7AF) ||  // 韩文
         (code >= 0xFF00 && code <= 0xFFEF) ||  // 全角 ASCII
-        (code >= 0x1F300 && code <= 0x1FAFF)   // Emoji 范围
+        (code >= 0x1F300 && code <= 0x1FAFF) || // Emoji 范围
+        (code >= 0x2600 && code <= 0x27BF) ||  // Misc Symbols (e.g. ☀, ☂, ☁) & Dingbats
+        (code >= 0x2B00 && code <= 0x2BFF)     // Misc Symbols and Arrows (e.g. ⭐ 0x2B50)
     );
 };
 

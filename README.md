@@ -6,18 +6,15 @@
 <h1 align="center">Smart Ticker</h1>
 
 <p align="center">
-  高性能智能文本差异滚动组件，支持中英、数字、字母、符号、Emoji等多种字符集，基于 Levenshtein diff 算法，适用于React/Vue，<a href="https://tombcato.github.io/smart-ticker/">官网演示></a>
+  <a href="./README.md">🇨🇳 简体中文</a> &nbsp;|&nbsp; <strong>🇬🇧 English</strong>
 </p>
-
+  High-Performance Text Diff Motion Component based on Levenshtein diff algorithm. Make your text flow like water.  <a href="https://tombcato.github.io/smart-ticker/?lang=en">Live Demo ></a> <br />
 <p align="center">
-  <strong>🇨🇳 简体中文</strong> &nbsp;|&nbsp; <a href="./README_EN.md">🇬🇧 English</a>
-</p>
-<p align="center">
-  支持任意字符文本<br />
+  Supports any characters<br />
   <img src="./smartticker2.gif" alt="Demo" width="600" />
 </p>
 <p align="center">
-支持前后缀，Intl格式化，自动缩放，边缘模糊<br />
+  Supports Prefix/Suffix, Intl Formatting, Auto-Scale, Fading Edges<br />
   <img src="./smartticker3.gif" alt="Demo" width="600" />
 </p>
 <p align="center">
@@ -33,55 +30,54 @@
 </p>
 
 
-## ✨ 特性
 | | |
 | :--- | :--- |
-| **🌏 多字符集支持**<br>支持中英、数字、Emoji等混合滚动，基于 Unicode 宽度自动调整间距 | **🧠 智能差异动画**<br>Levenshtein 算法计算最小变更路径，相同的字符保持静止 |
-| **⚡ 平滑中断**<br>动画过程中值突变时，从当前动态位置无缝流向新目标 | **📈 丰富动效**<br>内置多种缓动函数，支持自定义，支持 `charWidth` 微调 |
-| **🦄 双框架支持**<br>提供 React (Hooks) 和 Vue 3 (Composition) 组件，API 统一 | **🚀 极致性能**<br>基于 `RAF` 驱动，支持 **自动缩放**、**边缘模糊** 及 **动画禁用** |
+| **🌏 Multi-Charset Support**<br>Supports CJK, Numbers, Emojis, and mixed text rolling. Auto-adjusts spacing based on Unicode width. | **🧠 Smart Diff Animation**<br>Uses Levenshtein algorithm to find the shortest change path; identical characters remain static. |
+| **⚡ Smooth Interruption**<br>Seamlessly transitions to new targets if the value changes dynamically during animation. | **📈 Rich Motion**<br>Built-in variety of easings.Supports custom easing function. Supports `charWidth` fine-tuning. |
+| **🦄 Dual Framework**<br>Provides both React (Hooks) and Vue 3 (Composition) components with a unified API. | **🚀 High Performance**<br>Powered by `RAF`, supporting **Auto-scale**, **Fading Edge**, and **Disable Animation**. |
 
-## 📦 安装
+## 📦 Installation
 
-### NPM 安装（推荐）
+### NPM (Recommended)
 
 ```bash
 npm install @tombcato/smart-ticker
 ```
 
-### 从源码安装
+### From Source
 
 ```bash
-# 克隆仓库
+# Clone repository
 git clone https://github.com/tombcato/smart-ticker.git
 
-# 安装依赖
+# Install dependencies
 cd smart-ticker
 npm install
 
-# 启动开发服务器
+# Start dev server
 npm run dev
 ```
 
-## 🚀 使用方法
+## 🚀 Usage
 
-### 📦 引入样式 (Import Styles)
+### 📦 Import Styles
 
-**NPM 安装**时，**必须**显式引入样式文件组件才能正常工作。
+When using **NPM**, you **MUST** explicitly import the style file for the component to work.
 
 ```javascript
 import '@tombcato/smart-ticker/style.css'
 ```
 
-> **源码集成**：如果您直接复制组件源码，React 版本需确保引入同目录的 `Ticker.css`，Vue 版本样式已内置在单文件组件中。
+> **Source Integration**: If copying source code, ensure React version imports `Ticker.css` and Vue version uses the built-in styles.
 
 ### React
 
 ```tsx
-// NPM 方式
+// NPM Usage
 import { Ticker } from '@tombcato/smart-ticker';
 import '@tombcato/smart-ticker/style.css';
 
-// 源码方式
+// Source Usage
 // import { Ticker } from './components/Ticker';
 
 function App() {
@@ -103,11 +99,11 @@ function App() {
 
 ```vue
 <script setup>
-// NPM 方式
+// NPM Usage
 import { Ticker } from '@tombcato/smart-ticker/vue';
 import '@tombcato/smart-ticker/style.css';
 
-// 源码方式
+// Source Usage
 // import Ticker from './components/vue/Ticker.vue';
 
 import { ref } from 'vue';
@@ -125,50 +121,50 @@ const price = ref('73.18');
 </template>
 ```
 
-### 💅 样式自定义
+### 💅 Customization
 
-#### 自定义字体
+#### Custom Fonts
 
-组件默认使用系统等宽字体栈。如果需要使用自定义字体（如 `JetBrains Mono`），请确保该字体是**等宽字体**，并使用 CSS 覆盖：
+The component uses the system monospace stack by default. To use a custom font (e.g., `JetBrains Mono`), ensure it is **monospace** and override via CSS:
 
 ```css
-/* 全局样式或组件样式中 */
+/* In global styles or component styles */
 .ticker {
   font-family: 'JetBrains Mono', monospace !important;
 }
 ```
 
-> **注意**：必须使用**等宽字体**，否则字符滚动动画的对齐可能会出现偏差。
-
+> **Note**: Must be a **monospace font**, otherwise alignment issues may occur during scrolling animations.
 
 ## ⚙️ API
+
 ### Props
 
-| 属性 | 类型 | 默认值 | 说明 |
+| Prop | Type | Default | Description |
 |------|------|--------|------|
-| `value` | `string`\|`number` | - | 要显示的文本值（必填） |
-| `duration` | `number` | `500` | 动画持续时间（毫秒） |
-| `easing` | `EasingName \| function` | `'easeInOut'` | 缓动函数：`linear`、`easeIn`、`easeOut`、`easeInOut`、`bounce`，或自定义 `(t: number) => number` |
-| `direction` | `string` | `'ANY'` | 滚动方向：`UP`、`DOWN`、`ANY`（自动选择最短路径） |
-| `charWidth` | `number` | `1` | 字符宽度倍率（基准为 0.8em） |
-| `characterLists` | `string[]` | `['0123456789']` | 支持的字符列表 |
-| `className` | `string` | `''` | 自定义 CSS 类名 |
-| `animateOnMount` | `boolean` | `false` | 首次加载时是否播放动画 |
-| `disableAnimation` | `boolean` | `false` | 禁用动画，直接显示最终值 |
-| `autoScale` | `boolean` | `false` | 是否开启自动缩放以适配容器宽度 |
-| `fadingEdge` | `boolean` | `false` | 是否开启上下边缘模糊效果 |
-| `prefix` | `string` | - | 静态前缀（不参与滚动动画） |
-| `suffix` | `string` | - | 静态后缀（不参与滚动动画） |
-| `numberFormat` | `Intl.NumberFormat` | - | 国际化格式化配置，对数字`value`进行Format |
-| `onAnimationEnd` | `() => void` | - | 动画结束回调（Vue: `@animation-end`） |
+| `value` | `string`\|`number` | - | The text value to display (Required) |
+| `duration` | `number` | `500` | Animation duration (ms) |
+| `easing` | `EasingName \| function` | `'easeInOut'` | Easing: `linear`, `easeIn`, `easeOut`, `easeInOut`, `bounce`, or custom `(t: number) => number` |
+| `direction` | `string` | `'ANY'` | Scroll direction: `UP`, `DOWN`, `ANY` (shortest path) |
+| `charWidth` | `number` | `1` | Character width multiplier (base 0.8em) |
+| `characterLists` | `string[]` | `['0123456789']` | Allowed character sets |
+| `className` | `string` | `''` | Custom CSS class name |
+| `animateOnMount` | `boolean` | `false` | Animate on initial render |
+| `disableAnimation` | `boolean` | `false` | Disable animation, show final value immediately |
+| `autoScale` | `boolean` | `false` | Enable auto-scaling to fit container width |
+| `fadingEdge` | `boolean` | `false` | Enable top/bottom fading edge effect |
+| `prefix` | `string` | - | Static prefix (not animated) |
+| `suffix` | `string` | - | Static suffix (not animated) |
+| `numberFormat` | `Intl.NumberFormat` | - | Intl formatter number `value` |
+| `onAnimationEnd` | `() => void` | - | Callback when animation ends (Vue: `@animation-end`) |
 
 
-### 🧩 字符集配置详解 (characterLists)
+### 🧩 Character Configuration (characterLists)
 
-`characterLists` 是控制 Ticker 动画逻辑的核心配置。它接受一个字符串数组，数组的每一项代表一组**“可以互相滚动”**的字符。
+`characterLists` controls the core animation logic. It accepts an array of strings, where each string represents a group of characters that can **scroll into each other**.
 
-#### 预设常量 (Presets)
-为了方便使用，我们内置了常用的字符集常量：
+#### Presets (Common Character Lists)
+For convenience, we provide built-in constants for common character sets:
 
 ```ts
 import { Presets } from '@tombcato/smart-ticker';
@@ -179,87 +175,90 @@ Presets.ALPHANUMERIC  // '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQR
 Presets.CURRENCY      // '0123456789.,'
 ```
 
-#### 配置规则
-1.  **同组滚动**：如果旧字符和新字符在同一个字符串中（例如 `0` 变 `9` 在 `Presets.NUMBER` 中），它们会产生滚动动画。
-2.  **跨组替换**：如果它们不在同一组（例如 `a` 变 `1`），或者任何一个字符不在配置列表中（例如汉字），它们会原地切换（Switch），不会产生滚动。
+#### Animation Rules
+1.  **Scroll**: If both the old and new characters belong to the same group string (e.g., `0` to `9` in `Presets.NUMBER`), they will scroll.
+2.  **Switch**: If they are in different groups, or if a character is not in any list (e.g., Chinese characters), they will switch instantly (fade/flip) without scrolling.
 
-#### 配置技巧
-*   **常用场景**：直接使用 `Presets.ALPHANUMERIC` 即可支持绝大多数数字和字母的滚动。
-*   **物理隔离**：如果你不希望小写字母通过滚动变成大写字母（希望它们直接淡入淡出切换），请将它们配置为两个独立的字符串：`[Presets.NUMBER, 'abc...', 'ABC...']`。
+#### Configuration Tips
+*   **Common Use Case**: Simply use `Presets.ALPHANUMERIC` to support most alphanumeric scrolling.
+*   **Case Isolation**: To prevent scrolling between cases (e.g., `a` -> `A`), list them as separate groups: `[Presets.NUMBER, 'abc...', 'ABC...']`.
 
-**代码示例：**
+**Code Example:**
 
 ```tsx
 <Ticker
   value={val}
   characterLists={[
-    Presets.NUMBER,                 // 数字组
-    'abcdefghijklmnopqrstuvwxyz', // 小写组
-    'ABCDEFGHIJKLMNOPQRSTUVWXYZ', // 大写组
-    '.,!@#$%^&*'                  // 符号组
+    Presets.NUMBER,                 // Numbers
+    'abcdefghijklmnopqrstuvwxyz', // Lowercase Group
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZ', // Uppercase Group
+    '.,!@#$%^&*'                  // Symbols
   ]}
 />
 ```
 
-## 💻 运行演示
+## 💻 Running Demos
 
-本项目提供了完整基于 NPM 的 React 和 Vue 示例工程，位于 `examples` 目录下。
+This project includes complete NPM-based user examples for React and Vue in the `examples` directory.
 
-### 启动 React Demo
+### Start React Demo
 
 ```bash
 cd examples/react-demo
 npm install
 npm run dev
+# Demo runs at http://localhost:5179
 ```
 
-### 启动 Vue Demo
+### Start Vue Demo
 
 ```bash
 cd examples/vue-demo
 npm install
 npm run dev
+# Demo runs at http://localhost:5180
 ```
 
-## 📁 项目结构
+## 📁 Project Structure
 
 ```
 smart-ticker/
 ├── src/
 │   ├── components/
-│   │   ├── Ticker.tsx      # React 组件源码
-│   │   ├── Ticker.css      # 组件核心样式
+│   │   ├── Ticker.tsx      # React Component Source
+│   │   ├── Ticker.css      # Component Core Styles
 │   │   └── vue/
-│   │       └── Ticker.vue  # Vue 组件源码
+│   │       └── Ticker.vue  # Vue Component Source
 │   ├── core/
-│   │   └── TickerCore.ts   # 核心逻辑（Levenshtein diff 算法）
+│   │   └── TickerCore.ts   # Core Logic (Levenshtein diff algo)
 │   └── ...
-├── examples/               # 独立示例工程
+├── examples/               # Standalone Example Projects
 │   ├── react-demo/         # React Demo (Vite + React + TS)
 │   └── vue-demo/           # Vue Demo (Vite + Vue + TS)
 ├── public/
-│   └── vue-demo.html       # 单文件 CDN 引用示例
+│   └── vue-demo.html       # Single File CDN Demo
 └── package.json
 ```
 
-## 🎨 示例场景
+## 🎨 Example Scenarios
 
-- **金融数据** - 股票价格、加密货币行情
-- **计数器** - 访问量、点赞数
-- **比分牌** - 体育比赛实时比分
-- **机场信息牌** - 航班号、登机口
-- **隐私模式** - 余额隐藏/显示切换
+- **Financial Data** - Stock prices, crypto rates
+- **Counters** - Page views, likes
+- **Scoreboards** - Real-time sports scores
+- **Airport Info** - Flight numbers, gates
+- **Privacy Mode** - Balance hide/show toggle
 
-## 🔧 技术栈
+## 🔧 Tech Stack
 
-- **构建工具**: Vite
-- **语言**: TypeScript
-- **框架**: React 18 / Vue 3
-- **样式**: CSS Variables + 响应式设计
+- **Build Tool**: Vite
+- **Language**: TypeScript
+- **Frameworks**: React 18 / Vue 3
+- **Styling**: CSS Variables + Responsive Design
 
-## 📝 更新日志
+## 📝 Changelog
 
-查看 [CHANGELOG.md](./CHANGELOG.md) 了解版本更新详情。
+See [CHANGELOG_EN.md](./CHANGELOG_EN.md) for version history.
 
 ## 📄 License
+
 MIT

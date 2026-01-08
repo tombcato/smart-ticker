@@ -451,6 +451,8 @@ body {
     padding: 1.25rem;
     backdrop-filter: blur(10px);
     transition: transform 0.2s, background 0.2s, border-color 0.2s;
+    display: flex;
+    flex-direction: column;
 }
 
 .feature-card:hover {

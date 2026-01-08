@@ -1,8 +1,11 @@
 /**
- * Ticker - 直接翻译自 Robinhood Android Ticker
- * https://github.com/robinhood/ticker
+ * Smart Ticker
+ * High-Performance Text Diff Motion Component. Make your text flow like water
  */
-import React, { useEffect, useRef, useState, useMemo } from 'react';
+import React, { useEffect, useRef, useState, useMemo, useLayoutEffect } from 'react';
+
+// Use useLayoutEffect in browser to prevent flicker, useEffect in SSR
+const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
 import './Ticker.css';
 import {
     Presets,
@@ -23,15 +26,11 @@ import {
     getW,
 } from '../core/TickerCore';
 
-// 导出 Presets 供外部使用
 export { Presets };
 
-// 全角字符检测（提取到组件外避免每帧重复创建函数）
 
 
-// ============================================================================
-// Ticker Component
-// ============================================================================
+
 export interface TickerProps {
     value: string | number;
     numberFormat?: Intl.NumberFormat;
@@ -82,17 +81,12 @@ export const Ticker: React.FC<TickerProps> = ({
     fadingEdge = false,
     onAnimationEnd,
 }) => {
-    // 1. Reduced Motion
+
     const prefersReducedMotion = useReducedMotion();
     const shouldDisableAnimation = disableAnimation || prefersReducedMotion;
     const shouldDisableAnimationRef = useRef(shouldDisableAnimation);
 
-    // Sync ref
-    useEffect(() => {
-        shouldDisableAnimationRef.current = shouldDisableAnimation;
-    }, [shouldDisableAnimation]);
 
-    // 2. Computed Values (Memo)
     const displayValue = useMemo(() => {
         if (typeof value === 'number') {
             if (numberFormat) {
@@ -103,7 +97,6 @@ export const Ticker: React.FC<TickerProps> = ({
         return value;
     }, [value, numberFormat]);
 
-    // Normalize characterLists to array
     const charListStrings = useMemo(() =>
         Array.isArray(charListStringsProp) ? charListStringsProp : [charListStringsProp],
         [charListStringsProp]
@@ -115,43 +108,26 @@ export const Ticker: React.FC<TickerProps> = ({
         return set;
     }, [lists]);
 
-    // Normalize characterLists helper
     const getLists = (prop: string | string[]) =>
         (Array.isArray(prop) ? prop : [prop]).map(s => new TickerCharacterList(s));
 
-    // 3. Initialize State (SSR Compatible) - Calculate Full Columns for initial value
+    // Initialize state with full value to prevent hydration mismatch
     const [columns, setColumns] = useState<ColumnState[]>(() => {
-        // Initial sync render avoids blank first frame
         const targetChars = [...displayValue];
         const initialLists = getLists(charListStringsProp);
         return targetChars.map(char => {
             const col = setTarget(createColumn(), char, initialLists, direction);
-            return applyProgress(col, 1).col; // Snap to target immediately
+            return applyProgress(col, 1).col;
         });
     });
 
     const [progress, setProgress] = useState(1);
 
-    // Refs
     const animRef = useRef<number>();
-    const colsRef = useRef<ColumnState[]>(columns); // Initialize with state
+    const colsRef = useRef<ColumnState[]>(columns);
     const progressRef = useRef(1);
     const isFirstRef = useRef(true);
-    const prevValueRef = useRef(displayValue); // Initialize with current value to avoid immediate re-trigger? 
-    // Wait, if I initialize prevValueRef to displayValue, the useEffect for animation might NOT trigger on mount?
-    // If animateOnMount is TRUE, we WANT it to trigger.
-    // If animateOnMount is FALSE, we DON'T want it to trigger (since we already rendered it).
-    // So usually prevValueRef starts empty? No, if we rendered it, `prevValue` IS `displayValue`.
-
-    // Logic for animateOnMount:
-    // If animateOnMount=true, we fake prevValueRef to empty? 
-    // But we rendered full. 
-    // If we want to animate, we must differentiate.
-    // Getting strict:
-    // User wants SSR fix (static).
-    // So default: prevValueRef = displayValue.
-
-    // Refs for dependencies
+    const prevValueRef = useRef(displayValue);
     const listsRef = useRef(lists);
     const supportedRef = useRef(supported);
     const directionRef = useRef(direction);
@@ -169,31 +145,17 @@ export const Ticker: React.FC<TickerProps> = ({
 
 
     // Animation Effect
-    useEffect(() => {
-        // If animateOnMount is true and it's first run...
-        // But we initialized prevValueRef to displayValue? 
-        // Let's refine prevValueRef initialization.
-        // If animateOnMount is true, we ideally want to detect "start" as empty.
-        // But we constrained ourselves to SSR full render.
-        // So animateOnMount might be tricky.
-        // Use `isFirstRef` to handle this?
-
+    useIsomorphicLayoutEffect(() => {
         const isFirst = isFirstRef.current;
         const valueChanged = displayValue !== prevValueRef.current;
-
-        // Skip if nothing changed AND it's not the first run (or if no animation on mount requested)
-        if (!isFirst && !valueChanged) {
+        // Resume animation if interrupted (Strict Mode)
+        if (!isFirst && !valueChanged && progressRef.current === 1) {
             return;
         }
 
-        // Logic for first run:
-        // By default, we skip the animation IF it's the first run AND the value is the same as mount.
-        // But if the value has ALREADY changed since mount, we MUST proceed to sync and animate.
         if (isFirst) {
             isFirstRef.current = false;
-            if (!animateOnMount && !valueChanged) {
-                return;
-            }
+            if (!animateOnMount && !valueChanged) return;
         }
 
         prevValueRef.current = displayValue;
@@ -206,22 +168,13 @@ export const Ticker: React.FC<TickerProps> = ({
         }
 
         // Prepare for animation
-        // If isFirst and animateOnMount:
-        // Source should be empty? Or derived from "oldValue" which is... empty string?
-        // But colsRef is full.
-        // We need to Force Source to be Empty columns if animateOnMount && isFirst.
-
         let currentCols = colsRef.current;
 
-        // Special case: Animate on Mount with SSR data present
-        // We rendered Full. Now we want to animate Empty -> Full.
-        // This causes hydration mismatch visual jump.
-        // But we will proceed.
         if (isFirst && animateOnMount) {
-            currentCols = []; // Start from empty?
-            // Note: This effectively discards the "Full" layout we just rendered and starts from scratch.
+            // Start from empty if animating on mount
+            currentCols = [];
         } else if (progressRef.current < 1 && progressRef.current > 0) {
-            // Interrupted
+            // Smoothly interrupted
             currentCols = currentCols.map(c => applyProgress(c, progressRef.current, true).col);
         }
 
@@ -246,12 +199,13 @@ export const Ticker: React.FC<TickerProps> = ({
         }
 
         colsRef.current = result;
-        setColumns(result);
 
         // Trigger Animation
         if (shouldAnimate && result.length > 0) {
             progressRef.current = 0;
             setProgress(0);
+            setColumns(result);
+
             const start = performance.now();
             const dur = durationRef.current;
             const easeFn = typeof easingRef.current === 'function'
@@ -284,14 +238,6 @@ export const Ticker: React.FC<TickerProps> = ({
             animRef.current = requestAnimationFrame(animate);
         } else {
             // Immediate update (e.g. reduced motion or shouldDisableAnimation)
-            // But wait, if initial load and no animation, we already have it?
-            // Not if "shouldDisableAnimation" changed or logic path is different?
-            // Actually, if !shouldAnimate, we just snap.
-
-            // If isFirst, we already set initial state. But "result" might differ 
-            // if we somehow had different logic? Unlikely.
-            // But if we came here, we computed result.
-
             progressRef.current = 1;
             setProgress(1);
             const final = result.map(c => applyProgress(c, 1).col).filter(c => c.currentWidth > 0);

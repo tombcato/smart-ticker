@@ -1,7 +1,7 @@
 {
   "name": "@tombcato/smart-ticker",
-  "version": "1.2.0",
-  "description": "Smart text animation component with diff-based character scrollin",
+  "version": "1.2.1",
+  "description": "High-Performance Text Diff Motion Component based on Levenshtein diff algorithm. Make your text flow like water.",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -38,6 +38,10 @@
     "text-animation",
     "counter",
     "odometer",
+    "number-flow",
+    "text-flow",
+    "Text Diff",
+    "Levenshtein diff",
     "flip-clock"
   ],
   "author": "",
