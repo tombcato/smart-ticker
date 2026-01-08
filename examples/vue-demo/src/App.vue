@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, computed, watch, nextTick } from 'vue'
+import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
 import Ticker from '../../../src/components/vue/Ticker.vue'
 import { Presets } from '../../../src/core/TickerCore'
 import '../../../src/components/Ticker.css'
@@ -19,13 +19,7 @@ const direction = ref<'ANY' | 'UP' | 'DOWN'>('ANY')
 const prefix = ref('')
 const suffix = ref('')
 const disableAnimation = ref(false)
-const copied = ref(false)
-
 const activeFormatter = ref<Intl.NumberFormat | undefined>()
-const activeIntlParams = ref<{ locale: string, options: Intl.NumberFormatOptions }>({ 
-  locale: 'en-US', 
-  options: { style: 'currency', currency: 'USD' } 
-})
 
 let timer: any
 
@@ -52,7 +46,6 @@ function startTimer() {
         const conf = intlConfig[i]
         value.value = conf.val
         activeFormatter.value = new Intl.NumberFormat(conf.locale, conf.options)
-        activeIntlParams.value = { locale: conf.locale, options: conf.options }
     }
     update(0)
 
@@ -118,12 +111,6 @@ const displayValue = computed(() => {
     : (mode.value === 'price' ? Number(value.value).toFixed(2) : String(value.value))
 })
 
-const copyCode = () => {
-  const code = document.querySelector('.code-section code')?.textContent || ''
-  navigator.clipboard.writeText(code)
-  copied.value = true
-  setTimeout(() => copied.value = false, 2000)
-}
 </script>
 
 <template>
@@ -258,49 +245,6 @@ const copyCode = () => {
         </div>
       </div>
     </div>
-
-    <footer class="code-section">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-        <h2 style="margin: 0;">💻 使用代码</h2>
-        <button 
-          @click="copyCode"
-          :style="{
-              padding: '6px 12px',
-              borderRadius: '6px',
-              border: '1px solid #e0e0e0',
-              background: copied ? '#4a6bff' : '#fff',
-              color: copied ? '#fff' : '#666',
-              cursor: 'pointer',
-              fontSize: '14px',
-              transition: 'all 0.2s'
-          }"
-        >
-          {{ copied ? '✓ 已复制' : '📋 复制' }}
-        </button>
-      </div>
-      <pre><code>import { Ticker, Presets } from '@tombcato/smart-ticker/vue
-import '@tombcato/smart-ticker/style.css'
-{{ mode === 'intl-currency' ? `
-// Intl.NumberFormat 实例
-const formatter = new Intl.NumberFormat(
-    '${activeIntlParams.locale}', 
-    ${JSON.stringify(activeIntlParams.options).replace(/"/g, "'")})
-` : '' }}
-&lt;Ticker
-  value={ {{ typeof displayValue === 'number' ? displayValue : `"${displayValue}"` }} }
-  duration={ {{ duration }} }
-  easing="{{ easing }}"
-  charWidth={ {{ charWidth }} }
-  direction="{{ direction }}"{{ prefix ? `
-  prefix="${prefix}"` : '' }}{{ suffix ? `
-  suffix="${suffix}"` : '' }}{{ disableAnimation ? `
-  disableAnimation` : '' }}
-  characterLists={ {{ mode === 'text' ? '[Presets.ALPHABET, Presets.NUMBER, " .%@#$"]' : (mode === 'intl-currency' ? 'Presets.CURRENCY' : 'Presets.NUMBER') }} }{{ mode === 'intl-currency' ? `
-  numberFormat={formatter}` : '' }}{{ autoScale ? `
-  autoScale` : '' }}{{ fadingEdge ? `
-  fadingEdge` : '' }}
-/&gt;</code></pre>
-    </footer>
   </div>
 </template>
 

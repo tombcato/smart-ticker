@@ -1,8 +1,12 @@
 # Changelog
 
-## [1.2.0] - 2026-01-06
+## [1.2.3] - 2026-01-08
 
 ### ✨ New Features
+- **Svelte Framework Support**
+    - **Native Component**: First-class support for Svelte! Import via standard path: `import { Ticker } from '@tombcato/smart-ticker/svelte'`.
+    - **Demo Project**: Added `examples/svelte-demo`, providing a complete integration reference.
+    - **Official Site Upgrade**: The official demo now fully supports real-time preview and generation of Svelte code.
 - **Core Functionality Upgrade (Core)**
     - **Intl Support**: Added `numberFormat` prop for `value` (number type), leveraging `Intl.NumberFormat` for internationalized formatting.
     - **`autoScale`**: Automatically scales content to fit container (requires parent container with defined dimensions).
@@ -36,9 +40,7 @@
 
 ---
 
-## [1.0.4] - 2025-12-28
 
-## [1.0.4] - 2025-12-28
 
 ### ✨ Initial Release
 - Levenshtein diff algorithm for smart text diffing

@@ -15,14 +15,12 @@ function App() {
     const [fadingEdge, setFadingEdge] = useState(true)
 
     const [activeFormatter, setActiveFormatter] = useState<Intl.NumberFormat | undefined>()
-    const [activeIntlParams, setActiveIntlParams] = useState<{ locale: string, options: Intl.NumberFormatOptions }>({ locale: 'en-US', options: { style: 'currency', currency: 'USD' } })
 
     const [direction, setDirection] = useState<'ANY' | 'UP' | 'DOWN'>('ANY')
     const [prefix, setPrefix] = useState('')
     const [suffix, setSuffix] = useState('')
     const [disableAnimation, setDisableAnimation] = useState(false)
     const [autoScale, setAutoScale] = useState(false)
-    const [copied, setCopied] = useState(false)
 
     useEffect(() => {
         let timer: number
@@ -49,7 +47,6 @@ function App() {
                 const conf = intlConfig[i]
                 setValue(conf.val)
                 setActiveFormatter(new Intl.NumberFormat(conf.locale, conf.options))
-                setActiveIntlParams({ locale: conf.locale, options: conf.options })
             }
             update(0)
 
@@ -273,54 +270,6 @@ function App() {
                     </div>
                 </div>
             </div>
-
-            <footer className="code-section">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                    <h2 style={{ margin: 0 }}>💻 使用代码</h2>
-                    <button
-                        onClick={() => {
-                            const code = document.querySelector('.code-section code')?.textContent || ''
-                            navigator.clipboard.writeText(code)
-                            setCopied(true)
-                            setTimeout(() => setCopied(false), 2000)
-                        }}
-                        style={{
-                            padding: '6px 12px',
-                            borderRadius: '6px',
-                            border: '1px solid #e0e0e0',
-                            background: copied ? '#4a6bff' : '#fff',
-                            color: copied ? '#fff' : '#666',
-                            cursor: 'pointer',
-                            fontSize: '14px',
-                            transition: 'all 0.2s'
-                        }}
-                    >
-                        {copied ? '✓ 已复制' : '📋 复制'}
-                    </button>
-                </div>
-                <pre><code>{`import { Ticker, Presets } from '@tombcato/smart-ticker'
-import '@tombcato/smart-ticker/style.css'
-${mode === 'intl-currency' ? `
-// Intl.NumberFormat 实例
-const formatter = new Intl.NumberFormat(
-    '${activeIntlParams.locale}', 
-    ${JSON.stringify(activeIntlParams.options).replace(/"/g, "'")})
-` : ''}
-<Ticker
-  value={${typeof displayValueForProps === 'number' ? displayValueForProps : `"${displayValueForProps}"`}}
-  duration={${duration}}
-  easing="${easing}"
-  charWidth={${charWidth}}
-  direction="${direction}"${prefix ? `
-  prefix="${prefix}"` : ''}${suffix ? `
-  suffix="${suffix}"` : ''}${disableAnimation ? `
-  disableAnimation` : ''}
-  characterLists={${mode === 'text' ? '[Presets.ALPHABET, Presets.NUMBER, " .%@#$"]' : (mode === 'intl-currency' ? 'Presets.CURRENCY' : 'Presets.NUMBER')}}${mode === 'intl-currency' ? `
-  numberFormat={formatter}` : ''}${autoScale ? `
-  autoScale` : ''}${fadingEdge ? `
-  fadingEdge` : ''}
-/>`}</code></pre>
-            </footer>
         </div>
     )
 }

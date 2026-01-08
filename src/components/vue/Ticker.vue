@@ -32,7 +32,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, watch, onUnmounted, onMounted, PropType, toRaw } from 'vue';
+import { ref, computed, watch, onUnmounted, onMounted, toRaw } from 'vue';
 import {
     TickerCharacterList,
     Presets,

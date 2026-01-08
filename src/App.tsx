@@ -36,7 +36,7 @@ function App() {
 
     // Code Preview State
     const [codeExpanded, setCodeExpanded] = useState(true);
-    const [codeFramework, setCodeFramework] = useState<'react' | 'vue'>('react');
+    const [codeFramework, setCodeFramework] = useState<'react' | 'vue' | 'svelte'>('react');
     const [copied, setCopied] = useState(false);
 
     const [animDuration, setAnimDuration] = useState(800);
@@ -153,7 +153,7 @@ function App() {
     const t = {
         zh: {
             title: 'Smart Ticker',
-            subtitle: '高性能智能文本差异动画组件，支持React/Vue',
+            subtitle: '高性能智能文本差异动画组件，支持React/Vue/Svelte',
             changelog: '更新日志',
             price: '数字',
             text: '文本',
@@ -220,7 +220,7 @@ function App() {
                 dynamic: '灵动'
             },
             codePreview: {
-                viewCode: '查看代码',
+                viewCode: '查看代码 React/Vue/Svelte',
                 copied: '已复制!',
                 copy: '复制'
             },
@@ -245,7 +245,7 @@ function App() {
         },
         en: {
             title: 'Smart Ticker',
-            subtitle: 'High-Performance Text Diff Motion Component for React/Vue',
+            subtitle: 'High-Performance Text Diff Motion Component for React/Vue/Svelte',
             changelog: 'Changelog',
             price: 'Number',
             text: 'Text',
@@ -312,7 +312,7 @@ function App() {
                 dynamic: 'Dynamic'
             },
             codePreview: {
-                viewCode: 'View Code',
+                viewCode: 'View Code (React/Vue/Svelte)',
                 copied: 'Copied!',
                 copy: 'Copy'
             },
@@ -438,7 +438,7 @@ function App() {
                             <circle cx="12" cy="12" r="9" />
                         </svg>
                         <span className="changelog-label">{t.changelog}</span>
-                        <span className="version-badge">1.2.0</span>
+                        <span className="version-badge">1.2.3</span>
                     </a>
 
 
@@ -652,7 +652,7 @@ function App() {
                         <span className="control-label" style={{ display: 'block', width: '100%', textAlign: 'center' }}>{t.decorationTitle}</span>
 
                         {/* Toggles Row */}
-                        <div className="control-buttons" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', marginBottom: '4px' }}>
+                        <div className="control-buttons" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
                             <button
                                 className={autoScale ? 'active' : ''}
                                 onClick={() => setAutoScale(!autoScale)}
@@ -674,7 +674,7 @@ function App() {
                         </div>
 
                         {/* Decoration Row - margin-top reduced via CSS gap above */}
-                        <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', width: '100%' }}>
+                        <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', width: '100%', marginTop: '-6px' }}>
                             <div style={{ position: 'relative' }}>
                                 <span style={{ position: 'absolute', left: '8px', top: '50%', transform: 'translateY(-50%)', fontSize: '12px', color: '#888', pointerEvents: 'none' }}>{t.prefixLabel}</span>
                                 <input
@@ -838,6 +838,22 @@ function App() {
                                     >
                                         VUE
                                     </button>
+                                    <button
+                                        onClick={() => setCodeFramework('svelte')}
+                                        style={{
+                                            padding: '4px 12px',
+                                            fontSize: '11px',
+                                            borderRadius: '6px',
+                                            border: 'none',
+                                            cursor: 'pointer',
+                                            transition: 'all 0.2s',
+                                            background: codeFramework === 'svelte' ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
+                                            color: codeFramework === 'svelte' ? '#ff3e00' : 'rgba(255, 255, 255, 0.4)',
+                                            fontWeight: codeFramework === 'svelte' ? 600 : 400
+                                        }}
+                                    >
+                                        SVELTE
+                                    </button>
                                 </div>
 
                                 {/* Right: Action Buttons */}
@@ -880,8 +896,9 @@ function App() {
                                                 : '';
                                             const numberFormatProp = heroMode === 'intl-currency' ? '\n  numberFormat={formatter}' : '';
 
-                                            const appCode = codeFramework === 'react'
-                                                ? `import { useState } from 'react'
+                                            let appCode = '';
+                                            if (codeFramework === 'react') {
+                                                appCode = `import { useState } from 'react'
 import { Ticker, Presets } from '@tombcato/smart-ticker'
 import '@tombcato/smart-ticker/style.css'
 ${formatterCode}
@@ -944,8 +961,9 @@ export default function App() {
       </button>
     </div>
   )
-}`
-                                                : `<script setup>
+}`;
+                                            } else if (codeFramework === 'vue') {
+                                                appCode = `<script setup>
 import { ref } from 'vue'
 import { Ticker, Presets } from '@tombcato/smart-ticker/vue'
 import '@tombcato/smart-ticker/style.css'
@@ -966,10 +984,10 @@ const randomize = () => {
       <Ticker
         :value="value"
         :duration="${animDuration}"
-        :easing="'${easing}'"
+        easing="${easing}"
         :charWidth="${charWidth}"
-        :direction="'${direction}'"
-        :characterLists="[${preset}]"${prefix ? `\n        :prefix="'${prefix}'"` : ''}${suffix ? `\n        :suffix="'${suffix}'"` : ''}${autoScale ? '\n        autoScale' : ''}${fadingEdge ? '\n        fadingEdge' : ''}${disableAnimation ? '\n        disableAnimation' : ''}${heroMode === 'intl-currency' ? '\n        :numberFormat="formatter"' : ''}
+        direction="${direction}"
+        :characterLists="[${preset}]"${prefix ? `\n        prefix="${prefix}"` : ''}${suffix ? `\n        suffix="${suffix}"` : ''}${autoScale ? '\n        autoScale' : ''}${fadingEdge ? '\n        fadingEdge' : ''}${disableAnimation ? '\n        disableAnimation' : ''}${heroMode === 'intl-currency' ? '\n        :numberFormat="formatter"' : ''}
       />
     </div>
 
@@ -1032,9 +1050,94 @@ button:hover {
   transform: scale(1.05);
 }
 </style>`;
+                                            } else {
+                                                // Svelte
+                                                appCode = `<script>
+  import { Ticker, Presets } from '@tombcato/smart-ticker/svelte';
+  import '@tombcato/smart-ticker/style.css';
+${formatterCode}
 
-                                            const files = codeFramework === 'react'
-                                                ? {
+  let value = ${heroMode === 'text' ? `'${heroValue}'` : heroValue};
+
+  function randomize() {
+    value = ${heroMode === 'text' ? "Math.random().toString(36).substring(7)" : "Math.random() * 10000"};
+  }
+</script>
+
+<div class="container">
+  <h1>Smart Ticker Demo</h1>
+  
+  <div class="card">
+    <Ticker
+      {value}
+      duration={${animDuration}}
+      easing="${easing}"
+      charWidth={${charWidth}}
+      direction="${direction}"
+      characterLists={[${preset}]}${prefix ? `\n      prefix="${prefix}"` : ''}${suffix ? `\n      suffix="${suffix}"` : ''}${autoScale ? '\n      autoScale={true}' : ''}${fadingEdge ? '\n      fadingEdge={true}' : ''}${disableAnimation ? '\n      disableAnimation={true}' : ''}${heroMode === 'intl-currency' ? '\n      numberFormat={formatter}' : ''}
+    />
+  </div>
+
+  <button on:click={randomize}>Randomize Value</button>
+</div>
+
+<style>
+  :global(body) {
+    margin: 0;
+    background-color: #0a0a0a;
+    color: #ffffff;
+    font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  }
+
+  .container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  h1 {
+    margin-bottom: 2rem;
+    font-size: 2rem;
+    font-weight: 600;
+  }
+
+  .card {
+    padding: 3rem;
+    background: #1a1a1a;
+    border-radius: 24px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    border: 1px solid #333;
+    margin-bottom: 2rem;
+    min-width: 300px;
+    display: flex;
+    justify-content: center;
+    font-size: 3rem;
+    font-weight: bold;
+  }
+
+  button {
+    padding: 12px 28px;
+    border-radius: 99px;
+    border: none;
+    background: #FFFFFF;
+    color: #000;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s;
+    font-size: 1rem;
+  }
+
+  button:hover {
+    transform: scale(1.05);
+  }
+</style>`;
+                                            }
+
+                                            let files: Record<string, string> = {};
+                                            if (codeFramework === 'react') {
+                                                files = {
                                                     'App.tsx': appCode,
                                                     'index.tsx': `import { createRoot } from 'react-dom/client'
 import App from './App'
@@ -1087,8 +1190,9 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
 })`
-                                                }
-                                                : {
+                                                };
+                                            } else if (codeFramework === 'vue') {
+                                                files = {
                                                     'src/App.vue': appCode,
                                                     'src/main.ts': `import { createApp } from 'vue'
 import App from './App.vue'
@@ -1120,13 +1224,49 @@ export default defineConfig({
   plugins: [vue()],
 })`
                                                 };
+                                            } else {
+                                                // Svelte
+                                                files = {
+                                                    'src/App.svelte': appCode,
+                                                    'src/main.ts': `import App from './App.svelte'
+const app = new App({ target: document.getElementById('app')! })
+export default app`,
+                                                    'index.html': `<!DOCTYPE html>
+<html><body><div id="app"></div><script type="module" src="/src/main.ts"></script></body></html>`,
+                                                    'package.json': JSON.stringify({
+                                                        name: 'smart-ticker-svelte-demo',
+                                                        private: true,
+                                                        scripts: {
+                                                            "dev": "vite",
+                                                            "build": "vite build",
+                                                            "preview": "vite preview"
+                                                        },
+                                                        dependencies: {
+                                                            '@tombcato/smart-ticker': 'latest'
+                                                        },
+                                                        devDependencies: {
+                                                            "@sveltejs/vite-plugin-svelte": "^3.0.0",
+                                                            "svelte": "^4.2.0",
+                                                            "typescript": "^5.2.0",
+                                                            "vite": "^5.0.0"
+                                                        }
+                                                    }, null, 2),
+                                                    'vite.config.ts': `import { defineConfig } from 'vite'
+import { svelte } from '@sveltejs/vite-plugin-svelte'
+export default defineConfig({
+  plugins: [svelte()],
+})`
+                                                };
+                                            }
 
                                             // Use StackBlitz SDK
+                                            const frameworkNames = { react: 'React', vue: 'Vue', svelte: 'Svelte' };
+                                            const openFiles = { react: 'App.tsx', vue: 'src/App.vue', svelte: 'src/App.svelte' };
                                             sdk.openProject({
-                                                title: `Smart Ticker ${codeFramework === 'react' ? 'React' : 'Vue'} Demo`,
+                                                title: `Smart Ticker ${frameworkNames[codeFramework]} Demo`,
                                                 template: 'node',
-                                                files: files as unknown as Record<string, string>
-                                            }, { openFile: codeFramework === 'react' ? 'App.tsx' : 'src/App.vue' });
+                                                files: files
+                                            }, { openFile: openFiles[codeFramework] });
                                         }}
                                         style={{
                                             display: 'flex',
@@ -1235,7 +1375,7 @@ export default defineConfig({
                                             {'\n'}
                                             <span style={{ color: '#89b4fa' }}>/{'>'}</span>
                                         </>
-                                    ) : (
+                                    ) : codeFramework === 'vue' ? (
                                         <>
                                             <span style={{ color: '#cba6f7' }}>import</span>
                                             <span style={{ color: '#cdd6f4' }}> {'{ '}</span>
@@ -1269,7 +1409,7 @@ export default defineConfig({
                                             <span style={{ color: '#cdd6f4' }}>=</span>
                                             <span style={{ color: '#a6e3a1' }}>"{animDuration}"</span>
                                             {'\n'}
-                                            <span style={{ color: '#89dceb' }}>  :easing</span>
+                                            <span style={{ color: '#89dceb' }}>  easing</span>
                                             <span style={{ color: '#cdd6f4' }}>=</span>
                                             <span style={{ color: '#a6e3a1' }}>"{easing}"</span>
                                             {'\n'}
@@ -1277,12 +1417,12 @@ export default defineConfig({
                                             <span style={{ color: '#cdd6f4' }}>=</span>
                                             <span style={{ color: '#a6e3a1' }}>"{charWidth}"</span>
                                             {'\n'}
-                                            <span style={{ color: '#89dceb' }}>  :direction</span>
+                                            <span style={{ color: '#89dceb' }}>  direction</span>
                                             <span style={{ color: '#cdd6f4' }}>=</span>
                                             <span style={{ color: '#a6e3a1' }}>"{direction}"</span>
                                             {<>{'\n'}<span style={{ color: '#89dceb' }}>  :characterLists</span><span style={{ color: '#cdd6f4' }}>=</span><span style={{ color: '#a6e3a1' }}>"{heroMode === 'text' ? '[Presets.ALPHANUMERIC]' : (heroMode === 'intl-currency' ? '[Presets.CURRENCY]' : '[Presets.NUMBER]')}"</span></>}
-                                            {prefix && <>{'\n'}<span style={{ color: '#89dceb' }}>  :prefix</span><span style={{ color: '#cdd6f4' }}>=</span><span style={{ color: '#a6e3a1' }}>"{prefix}"</span></>}
-                                            {suffix && <>{'\n'}<span style={{ color: '#89dceb' }}>  :suffix</span><span style={{ color: '#cdd6f4' }}>=</span><span style={{ color: '#a6e3a1' }}>"{suffix}"</span></>}
+                                            {prefix && <>{'\n'}<span style={{ color: '#89dceb' }}>  prefix</span><span style={{ color: '#cdd6f4' }}>=</span><span style={{ color: '#a6e3a1' }}>"{prefix}"</span></>}
+                                            {suffix && <>{'\n'}<span style={{ color: '#89dceb' }}>  suffix</span><span style={{ color: '#cdd6f4' }}>=</span><span style={{ color: '#a6e3a1' }}>"{suffix}"</span></>}
                                             {autoScale && <>{'\n'}<span style={{ color: '#89dceb' }}>  :autoScale</span></>}
                                             {fadingEdge && <>{'\n'}<span style={{ color: '#89dceb' }}>  :fadingEdge</span></>}
                                             {disableAnimation && <>{'\n'}<span style={{ color: '#89dceb' }}>  :disableAnimation</span></>}
@@ -1292,6 +1432,77 @@ export default defineConfig({
                                                     <span style={{ color: '#89dceb' }}>  :numberFormat</span>
                                                     <span style={{ color: '#cdd6f4' }}>=</span>
                                                     <span style={{ color: '#a6e3a1' }}>"formatter"</span>
+                                                </>
+                                            )}
+                                            {'\n'}
+                                            <span style={{ color: '#89b4fa' }}>/{'>'}</span>
+                                        </>
+                                    ) : (
+                                        /* Svelte */
+                                        <>
+                                            <span style={{ color: '#cba6f7' }}>import</span>
+                                            <span style={{ color: '#cdd6f4' }}> {'{ '}</span>
+                                            <span style={{ color: '#f9e2af' }}>Ticker</span>
+                                            <span style={{ color: '#cdd6f4' }}>{' }'} </span>
+                                            <span style={{ color: '#cba6f7' }}>from</span>
+                                            <span style={{ color: '#a6e3a1' }}> '@tombcato/smart-ticker/svelte'</span>
+                                            {'\n'}
+                                            <span style={{ color: '#cba6f7' }}>import</span>
+                                            <span style={{ color: '#a6e3a1' }}> '@tombcato/smart-ticker/style.css'</span>
+                                            {heroMode === 'intl-currency' && activeIntlConfig && (
+                                                <>
+                                                    {'\n\n'}
+                                                    <span style={{ color: '#cba6f7' }}>const</span>
+                                                    <span style={{ color: '#cdd6f4' }}> formatter = </span>
+                                                    <span style={{ color: '#fab387' }}>{`new Intl.NumberFormat(`}</span>
+                                                    {'\n'}
+                                                    <span style={{ color: '#fab387' }}>{`  '${activeIntlConfig.locale}', ${JSON.stringify(activeIntlConfig.options).replace(/"/g, "'")}`}</span>
+                                                    <span style={{ color: '#fab387' }}>)</span>
+                                                </>
+                                            )}
+                                            {'\n\n'}
+                                            <span style={{ color: '#89b4fa' }}>{'<'}</span>
+                                            <span style={{ color: '#f9e2af' }}>Ticker</span>
+                                            {'\n'}
+                                            <span style={{ color: '#89dceb' }}>  value</span>
+                                            <span style={{ color: '#cdd6f4' }}>=</span>
+                                            <span style={{ color: '#cdd6f4' }}>{'{'}</span>
+                                            <span style={{ color: '#fab387' }}>{heroMode === 'text' ? `"${heroValue}"` : heroValue}</span>
+                                            <span style={{ color: '#cdd6f4' }}>{'}'}</span>
+                                            {'\n'}
+                                            <span style={{ color: '#89dceb' }}>  duration</span>
+                                            <span style={{ color: '#cdd6f4' }}>=</span>
+                                            <span style={{ color: '#cdd6f4' }}>{'{'}</span>
+                                            <span style={{ color: '#fab387' }}>{animDuration}</span>
+                                            <span style={{ color: '#cdd6f4' }}>{'}'}</span>
+                                            {'\n'}
+                                            <span style={{ color: '#89dceb' }}>  easing</span>
+                                            <span style={{ color: '#cdd6f4' }}>=</span>
+                                            <span style={{ color: '#a6e3a1' }}>"{easing}"</span>
+                                            {'\n'}
+                                            <span style={{ color: '#89dceb' }}>  charWidth</span>
+                                            <span style={{ color: '#cdd6f4' }}>=</span>
+                                            <span style={{ color: '#cdd6f4' }}>{'{'}</span>
+                                            <span style={{ color: '#fab387' }}>{charWidth}</span>
+                                            <span style={{ color: '#cdd6f4' }}>{'}'}</span>
+                                            {'\n'}
+                                            <span style={{ color: '#89dceb' }}>  direction</span>
+                                            <span style={{ color: '#cdd6f4' }}>=</span>
+                                            <span style={{ color: '#a6e3a1' }}>"{direction}"</span>
+                                            {<>{'\n'}<span style={{ color: '#89dceb' }}>  characterLists</span><span style={{ color: '#cdd6f4' }}>=</span><span style={{ color: '#cdd6f4' }}>{'{'}</span><span style={{ color: '#fab387' }}>{heroMode === 'text' ? '[Presets.ALPHANUMERIC]' : (heroMode === 'intl-currency' ? '[Presets.CURRENCY]' : '[Presets.NUMBER]')}</span><span style={{ color: '#cdd6f4' }}>{'}'}</span></>}
+                                            {prefix && <>{'\n'}<span style={{ color: '#89dceb' }}>  prefix</span><span style={{ color: '#cdd6f4' }}>=</span><span style={{ color: '#a6e3a1' }}>"{prefix}"</span></>}
+                                            {suffix && <>{'\n'}<span style={{ color: '#89dceb' }}>  suffix</span><span style={{ color: '#cdd6f4' }}>=</span><span style={{ color: '#a6e3a1' }}>"{suffix}"</span></>}
+                                            {autoScale && <>{'\n'}<span style={{ color: '#89dceb' }}>  autoScale</span><span style={{ color: '#cdd6f4' }}>=</span><span style={{ color: '#cdd6f4' }}>{'{'}</span><span style={{ color: '#fab387' }}>true</span><span style={{ color: '#cdd6f4' }}>{'}'}</span></>}
+                                            {fadingEdge && <>{'\n'}<span style={{ color: '#89dceb' }}>  fadingEdge</span><span style={{ color: '#cdd6f4' }}>=</span><span style={{ color: '#cdd6f4' }}>{'{'}</span><span style={{ color: '#fab387' }}>true</span><span style={{ color: '#cdd6f4' }}>{'}'}</span></>}
+                                            {disableAnimation && <>{'\n'}<span style={{ color: '#89dceb' }}>  disableAnimation</span><span style={{ color: '#cdd6f4' }}>=</span><span style={{ color: '#cdd6f4' }}>{'{'}</span><span style={{ color: '#fab387' }}>true</span><span style={{ color: '#cdd6f4' }}>{'}'}</span></>}
+                                            {heroMode === 'intl-currency' && activeIntlConfig && (
+                                                <>
+                                                    {'\n'}
+                                                    <span style={{ color: '#89dceb' }}>  numberFormat</span>
+                                                    <span style={{ color: '#cdd6f4' }}>=</span>
+                                                    <span style={{ color: '#cdd6f4' }}>{'{'}</span>
+                                                    <span style={{ color: '#fab387' }}>formatter</span>
+                                                    <span style={{ color: '#cdd6f4' }}>{'}'}</span>
                                                 </>
                                             )}
                                             {'\n'}

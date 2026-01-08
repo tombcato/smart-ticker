@@ -1,8 +1,12 @@
 # Changelog
-
-## [1.2.0] - 2026-01-06
+## [1.2.3] - 2026-01-08
 
 ### ✨ 新功能
+- **Svelte 框架支持**
+    - **原生组件**: 正式支持 Svelte！可通过标准方式引入：`import { Ticker } from '@tombcato/smart-ticker/svelte'`。
+    - **示例工程**: 新增 `examples/svelte-demo`，提供完整的集成参考。
+    - **官网升级**: 官方演示现已全面支持 Svelte 代码的实时预览与生成。
+
 - **核心功能升级 (Core)**
     - **Intl 支持**：`value`传数字时，支持`numberFormat`属性，配合`Intl.NumberFormat`使用, 支持国际化格式化。
     - **`autoScale`** 自动大小缩放适配容器，注意需要父控件给定宽高。
@@ -12,8 +16,8 @@
     - **前后缀完善**: 完善了 `prefix` / `suffix` 属性，确保静态文本不参与列滚动逻辑，且在布局切换时保持稳定。
     - **无障碍优化 (A11y)**: ARIA + Screen Reader 支持。自动检测系统 `prefers-reduced-motion` 设置，尊重用户减弱动画的偏好。
     - **`animateOnMount`** — 控制首次加载是否播放动画（默认 `false`）。
-- **回调事件**
     - **`onAnimationEnd` / `@animation-end`** — 动画结束回调。
+
 - **Vue 组件同步**
     - **属性对齐**：为 Vue 版本同步增加了 prefix、suffix、autoScale、fadingEdge 和 numberFormat等 Props。
     - **Intl 支持**：优化了 :number-format 属性的响应式逻辑，使其能配合国际化格式实时更新。
@@ -37,10 +41,8 @@
 
 ---
 
-## [1.0.4] - 2025-12-28
 
 ## [1.0.4] - 2025-12-28
-
 ### ✨ 初始发布
 - Levenshtein diff 算法智能文本差异
 - React 18+ / Vue 3+ 双框架支持

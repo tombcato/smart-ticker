@@ -1,6 +1,6 @@
 {
   "name": "@tombcato/smart-ticker",
-  "version": "1.2.1",
+  "version": "1.2.3",
   "description": "High-Performance Text Diff Motion Component based on Levenshtein diff algorithm. Make your text flow like water.",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -16,6 +16,11 @@
       "import": "./dist/vue.js",
       "require": "./dist/vue.cjs",
       "types": "./dist/vue.d.ts"
+    },
+    "./svelte": {
+      "import": "./dist/svelte.js",
+      "require": "./dist/svelte.cjs",
+      "types": "./dist/svelte.d.ts"
     },
     "./style.css": "./dist/style.css"
   },
@@ -35,6 +40,7 @@
     "animation",
     "react",
     "vue",
+    "svelte",
     "text-animation",
     "counter",
     "odometer",
@@ -48,12 +54,13 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/tombcato/smart-ticker"
+    "url": "git+https://github.com/tombcato/smart-ticker.git"
   },
   "peerDependencies": {
     "react": ">=17.0.0",
     "react-dom": ">=17.0.0",
-    "vue": ">=3.0.0"
+    "vue": ">=3.0.0",
+    "svelte": ">=4.0.0"
   },
   "peerDependenciesMeta": {
     "react": {
@@ -64,14 +71,19 @@
     },
     "vue": {
       "optional": true
+    },
+    "svelte": {
+      "optional": true
     }
   },
   "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^3.0.0",
     "@types/node": "^25.0.3",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
     "@vitejs/plugin-react": "^4.2.0",
     "@vitejs/plugin-vue": "^6.0.3",
+    "svelte": "^4.2.0",
     "typescript": "^5.3.0",
     "vite": "^5.0.0",
     "vite-plugin-dts": "^3.9.1"

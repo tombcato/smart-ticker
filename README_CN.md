@@ -5,10 +5,10 @@
 
 <h1 align="center">Smart Ticker</h1>
 <p align="center">
-  <strong>🇨🇳 简体中文</strong> &nbsp;|&nbsp; <a href="./README_EN.md">🇬🇧 English</a>
+  <strong>🇨🇳 简体中文</strong> &nbsp;|&nbsp; <a href="./README.md">🇬🇧 English</a>
 </p>
 <p align="center">
-  高性能文本 Diff 动画组件，让你的文本替换像水一样流动。基于 Levenshtein diff 算法，适用于React/Vue  <a href="https://tombcato.github.io/smart-ticker/">官网演示></a> <br />
+  高性能文本 Diff 动画组件，让你的文本替换像水一样流动。基于 Levenshtein diff 算法，适用于React/Vue/Svelte  <a href="https://tombcato.github.io/smart-ticker/">官网演示></a> <br />
 </p>
 <p align="center">
   支持任意字符文本<br />
@@ -26,6 +26,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/React-18+-61DAFB?logo=react" alt="React" />
   <img src="https://img.shields.io/badge/Vue-3+-4FC08D?logo=vuedotjs" alt="Vue" />
+  <img src="https://img.shields.io/badge/Svelte-4+-FF3E00?logo=svelte" alt="Svelte" />
   <img src="https://img.shields.io/badge/TypeScript-5+-3178C6?logo=typescript" alt="TypeScript" />
   <img src="https://img.shields.io/npm/v/@tombcato/smart-ticker?color=cb3837&logo=npm" alt="npm" />
 </p>
@@ -36,7 +37,7 @@
 | :--- | :--- |
 | **🌏 多字符集支持**<br>支持中英、数字、Emoji等混合滚动，基于 Unicode 宽度自动调整间距 | **🧠 智能差异动画**<br>Levenshtein 算法计算最小变更路径，相同的字符保持静止 |
 | **⚡ 平滑中断**<br>动画过程中值突变时，从当前动态位置无缝流向新目标 | **📈 丰富动效**<br>内置多种缓动函数，支持自定义，支持 `charWidth` 微调 |
-| **🦄 双框架支持**<br>提供 React (Hooks) 和 Vue 3 (Composition) 组件，API 统一 | **🚀 极致性能**<br>基于 `RAF` 驱动，支持 **自动缩放**、**边缘模糊** 及 **动画禁用** |
+| **🦄 多框架支持**<br>提供 React (Hooks)、Vue 3 (Composition) 和 Svelte 4+ 组件，API 统一 | **🚀 极致性能**<br>基于 `RAF` 驱动，支持 **自动缩放**、**边缘模糊** 及 **动画禁用** |
 
 ## 📦 安装
 
@@ -123,6 +124,26 @@ const price = ref('73.18');
 </template>
 ```
 
+### Svelte
+
+```svelte
+<script>
+  // NPM 方式
+  import { Ticker } from '@tombcato/smart-ticker/svelte';
+  import '@tombcato/smart-ticker/style.css';
+
+  let price = 73.18;
+</script>
+
+<Ticker
+  value={price.toFixed(2)}
+  duration={800}
+  easing="easeInOut"
+  charWidth={1}
+  characterLists={['0123456789.,']}
+/>
+```
+
 ### 💅 样式自定义
 
 #### 自定义字体
@@ -201,7 +222,7 @@ Presets.CURRENCY      // '0123456789.,'
 
 ## 💻 运行演示
 
-本项目提供了完整基于 NPM 的 React 和 Vue 示例工程，位于 `examples` 目录下。
+本项目提供了完整基于 NPM 的 React、Vue 和 Svelte 示例工程，位于 `examples` 目录下。
 
 ### 启动 React Demo
 
@@ -219,22 +240,33 @@ npm install
 npm run dev
 ```
 
+### 启动 Svelte Demo
+
+```bash
+cd examples/svelte-demo
+npm install
+npm run dev
+```
+
 ## 📁 项目结构
 
 ```
 smart-ticker/
 ├── src/
 │   ├── components/
-│   │   ├── Ticker.tsx      # React 组件源码
-│   │   ├── Ticker.css      # 组件核心样式
-│   │   └── vue/
-│   │       └── Ticker.vue  # Vue 组件源码
+│   │   ├── Ticker.tsx      # React 组件
+│   │   ├── Ticker.css      # 核心样式
+│   │   ├── vue/
+│   │   │   └── Ticker.vue  # Vue 组件
+│   │   └── svelte/
+│   │       └── Ticker.svelte # Svelte 组件
 │   ├── core/
 │   │   └── TickerCore.ts   # 核心逻辑（Levenshtein diff 算法）
 │   └── ...
 ├── examples/               # 独立示例工程
 │   ├── react-demo/         # React Demo (Vite + React + TS)
-│   └── vue-demo/           # Vue Demo (Vite + Vue + TS)
+│   ├── vue-demo/           # Vue Demo (Vite + Vue + TS)
+│   └── svelte-demo/        # Svelte Demo (Vite + Svelte + TS)
 ├── public/
 │   └── vue-demo.html       # 单文件 CDN 引用示例
 └── package.json
@@ -252,7 +284,7 @@ smart-ticker/
 
 - **构建工具**: Vite
 - **语言**: TypeScript
-- **框架**: React 18 / Vue 3
+- **框架**: React 18 / Vue 3 / Svelte 4+
 - **样式**: CSS Variables + 响应式设计
 
 ## 📝 更新日志

@@ -6,7 +6,7 @@
 <h1 align="center">Smart Ticker</h1>
 
 <p align="center">
-  <a href="./README.md">🇨🇳 简体中文</a> &nbsp;|&nbsp; <strong>🇬🇧 English</strong>
+  <a href="./README_CN.md">🇨🇳 简体中文</a> &nbsp;|&nbsp; <strong>🇬🇧 English</strong>
 </p>
   High-Performance Text Diff Motion Component based on Levenshtein diff algorithm. Make your text flow like water.  <a href="https://tombcato.github.io/smart-ticker/?lang=en">Live Demo ></a> <br />
 <p align="center">
@@ -25,6 +25,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/React-18+-61DAFB?logo=react" alt="React" />
   <img src="https://img.shields.io/badge/Vue-3+-4FC08D?logo=vuedotjs" alt="Vue" />
+  <img src="https://img.shields.io/badge/Svelte-4+-FF3E00?logo=svelte" alt="Svelte" />
   <img src="https://img.shields.io/badge/TypeScript-5+-3178C6?logo=typescript" alt="TypeScript" />
   <img src="https://img.shields.io/npm/v/@tombcato/smart-ticker?color=cb3837&logo=npm" alt="npm" />
 </p>
@@ -34,7 +35,7 @@
 | :--- | :--- |
 | **🌏 Multi-Charset Support**<br>Supports CJK, Numbers, Emojis, and mixed text rolling. Auto-adjusts spacing based on Unicode width. | **🧠 Smart Diff Animation**<br>Uses Levenshtein algorithm to find the shortest change path; identical characters remain static. |
 | **⚡ Smooth Interruption**<br>Seamlessly transitions to new targets if the value changes dynamically during animation. | **📈 Rich Motion**<br>Built-in variety of easings.Supports custom easing function. Supports `charWidth` fine-tuning. |
-| **🦄 Dual Framework**<br>Provides both React (Hooks) and Vue 3 (Composition) components with a unified API. | **🚀 High Performance**<br>Powered by `RAF`, supporting **Auto-scale**, **Fading Edge**, and **Disable Animation**. |
+| **🦄 Multi-Framework**<br>React (Hooks), Vue 3 (Composition), and Svelte 4+ components with a unified API. | **🚀 High Performance**<br>Powered by `RAF`, supporting **Auto-scale**, **Fading Edge**, and **Disable Animation**. |
 
 ## 📦 Installation
 
@@ -121,6 +122,26 @@ const price = ref('73.18');
 </template>
 ```
 
+### Svelte
+
+```svelte
+<script>
+  // NPM Usage
+  import { Ticker } from '@tombcato/smart-ticker/svelte';
+  import '@tombcato/smart-ticker/style.css';
+
+  let price = 73.18;
+</script>
+
+<Ticker
+  value={price.toFixed(2)}
+  duration={800}
+  easing="easeInOut"
+  charWidth={1}
+  characterLists={['0123456789.,']}
+/>
+```
+
 ### 💅 Customization
 
 #### Custom Fonts
@@ -199,7 +220,7 @@ Presets.CURRENCY      // '0123456789.,'
 
 ## 💻 Running Demos
 
-This project includes complete NPM-based user examples for React and Vue in the `examples` directory.
+This project includes complete NPM-based user examples for React, Vue, and Svelte in the `examples` directory.
 
 ### Start React Demo
 
@@ -207,7 +228,6 @@ This project includes complete NPM-based user examples for React and Vue in the 
 cd examples/react-demo
 npm install
 npm run dev
-# Demo runs at http://localhost:5179
 ```
 
 ### Start Vue Demo
@@ -216,7 +236,14 @@ npm run dev
 cd examples/vue-demo
 npm install
 npm run dev
-# Demo runs at http://localhost:5180
+```
+
+### Start Svelte Demo
+
+```bash
+cd examples/svelte-demo
+npm install
+npm run dev
 ```
 
 ## 📁 Project Structure
@@ -225,18 +252,19 @@ npm run dev
 smart-ticker/
 ├── src/
 │   ├── components/
-│   │   ├── Ticker.tsx      # React Component Source
-│   │   ├── Ticker.css      # Component Core Styles
-│   │   └── vue/
-│   │       └── Ticker.vue  # Vue Component Source
+│   │   ├── Ticker.tsx      # React Component
+│   │   ├── Ticker.css      # Core Styles
+│   │   ├── vue/
+│   │   │   └── Ticker.vue  # Vue Component
+│   │   └── svelte/
+│   │       └── Ticker.svelte # Svelte Component
 │   ├── core/
 │   │   └── TickerCore.ts   # Core Logic (Levenshtein diff algo)
 │   └── ...
 ├── examples/               # Standalone Example Projects
 │   ├── react-demo/         # React Demo (Vite + React + TS)
-│   └── vue-demo/           # Vue Demo (Vite + Vue + TS)
-├── public/
-│   └── vue-demo.html       # Single File CDN Demo
+│   ├── vue-demo/           # Vue Demo (Vite + Vue + TS)
+│   └── svelte-demo/        # Svelte Demo (Vite + Svelte + TS)
 └── package.json
 ```
 
@@ -252,7 +280,7 @@ smart-ticker/
 
 - **Build Tool**: Vite
 - **Language**: TypeScript
-- **Frameworks**: React 18 / Vue 3
+- **Frameworks**: React 18 / Vue 3 / Svelte 4+
 - **Styling**: CSS Variables + Responsive Design
 
 ## 📝 Changelog
